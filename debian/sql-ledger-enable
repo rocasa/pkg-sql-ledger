@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Activate SQL-Ledger in apache configuration.  Small helper script
+# to reduce the chance of typos.
+#
+# This should be rewritten to follow the info in
+# <URL:http://deb.riseup.net/mail/buffy/mail-clients/apache/> or
+# <URL:http://www.opal.dhs.org/involved/debian/apache/>, before it
+# is enabled.
+
+if [ -d /etc/apache/conf.d ] ; then # Debian/Sarge or later
+    echo "info: Detected apache for Debian/Sarge or later"
+    httpdconf=/etc/apache/conf.d/sql-ledger.conf
+else
+    echo "info: Detected apache for Debian/Woody or earlier"
+    httpdconf=/etc/apache/httpd.conf
+fi
+
+includeline="Include /etc/sql-ledger/sql-ledger-httpd.conf"
+
+if grep -q "^$includeline" $httpdconf ; then
+    echo "info: SQL-Ledger is already enabled in $httpdconf"
+else
+    echo "$includeline" >> $httpdconf
+    echo "info: Content of $httpdconf is updated."
+    echo "info: Please restart apache for this change to take effect."
+    echo "info: Remember that there might be no admin password set at"
+    echo "info: the moment, and the installation is open for everyone."
+fi

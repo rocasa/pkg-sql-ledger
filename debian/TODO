@@ -1,0 +1,11 @@
+cp users/ templates/ /var/lib/sql-ledger/
+cp/edit sql-ledger-default.conf /etc/sql-ledger/sql-ledger.conf
+create /etc/sql-ledger/sql-ledger-httpd.conf
+edit /etc/apache(-ssl)/http.conf to include sql-ledger-httpd.conf
+cp bin/ /usr/lib/sql-ledger/bin
+cd bin/lynx for ALL in ../mozilla/*.pl ; do ln -s $ALL ; done 
+cp -r ~/MY-CVS/sql-ledger/SL . 
+chown www-data:www-data users templates
+cp -r ~/MY-CVS/sql-ledger/sql .
+cp -r ~/MY-CVS/sql-ledger/locale . 
+

@@ -1,0 +1,30 @@
+sql-ledger for Debian
+---------------------
+
+To test this package you need to add this line to you
+/etc/apache/httpd.conf:
+ include /etc/sql-ledger/sql-ledger-httpd.conf
+or, if you run apache >= 1.3.29.0.1, please a symlink from
+/etc/sql-ledger/sql-ledger-httpd.conf to /etc/apache/conf.d
+then restart apache. 
+
+You also have to add some users to your postgres DB
+
+The easiest way to test this package is to add a postgres-users with
+the name of www-data. This however will mean that every apache process
+will be able to authenticate to your DB.
+
+To make a more robust security scheme, please read your postgres
+documentation, but for now, do , as root, a
+
+ su - postgres
+ createuser -d www-data
+
+Answer "n" to the question "Shall the new user be allowed to create
+more new users?"
+
+To finally test this, point your browser at
+http://localhost/sql-ledger/admin.pl to create the DB and the initial
+user, and afterwards: http://localhost/sql-ledger/login.pl to log in.
+
+ -- Finn-Arne Johansen <faj@bzz.no>, Sun,  March 21, 2004 15:41:25 +0100

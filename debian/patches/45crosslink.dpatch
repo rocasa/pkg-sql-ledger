@@ -1,0 +1,48 @@
+#! /bin/sh -e
+## 45crosslink.dpatch by Petter Reinholdtsen <pere@hungry.com>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+##
+## DP: Add links between admin and normal login pages.
+## DP: Sent upstream 2004-08-07.
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
+
+if [ $# -ne 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+       -patch)   ( cd BUILD/sql-ledger && patch $patch_opts -p1 ) < $0 ;;
+       -unpatch) ( cd BUILD/sql-ledger && patch $patch_opts -p1 -R ) < $0 ;;
+        *)
+                echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+                exit 1;;
+esac
+
+exit 0
+@DPATCH@
+diff -ur sql-ledger/bin/mozilla/admin.pl BUILD/sql-ledger/bin/mozilla/admin.pl
+--- sql-ledger/bin/mozilla/admin.pl	Tue Nov 23 22:56:46 2004
++++ BUILD/sql-ledger/bin/mozilla/admin.pl	Sun Nov 28 00:10:24 2004
+@@ -118,6 +118,7 @@
+ <input type=hidden name=action value=login>
+ <input type=hidden name=path value=$form->{path}>
+ </table>
++<p><a href="login.pl">Normal login</a></p>
+ 
+ </form>
+ 
+Only in BUILD/sql-ledger/bin/mozilla: admin.pl~
+diff -ur sql-ledger/bin/mozilla/login.pl BUILD/sql-ledger/bin/mozilla/login.pl
+--- sql-ledger/bin/mozilla/login.pl	Fri Nov  5 05:15:38 2004
++++ BUILD/sql-ledger/bin/mozilla/login.pl	Sun Nov 28 00:11:45 2004
+@@ -143,6 +143,7 @@
+     </td>
+   </tr>
+ </table>
++<p><a href="admin.pl">Administration login</a></p>
+   
+ </body>
+ </html>

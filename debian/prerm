@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm -f /usr/doc/sql-ledger || true
+
+#DEBHELPER#

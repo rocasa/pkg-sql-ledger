@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+#
+# Author:  Petter Reinholdtsen
+# Date:    2004-12-05
+# License: GPL
+#
+# Convert SQL-ledger 'all' translation files to gettext style .po
+# files, and back.
+#
+# Based on code from po-debconf.
+
+use Text::Wrap;
+
+my $infile = shift;;
+
+my %alltext;
+if ($infile eq "all") {
+    require "all";
+    %alltext = %{ $self{texts} };
+    as_po("all.po", %alltext);
+} elsif ($infile eq "all.po") {
+    %alltext = load_po($infile);
+    as_sql_ledger_all("all", %alltext);
+} else {
+    print STDERR "usage: $0 all    > all.po\n";
+    print STDERR "       $0 all.po > all\n";
+    exit 1;
+}
+
+exit 0;
+
+sub perl_encode {
+    $msg = shift;
+    # Using single quotes, so there is no need to escape
+    #$msg =~ s%\"%\\\"%g;
+    return $msg;
+}
+
+sub as_sql_ledger_all {
+    my ($filename, %alltext) = @_;
+
+    print <<EOF;
+# These are all the texts to build the translations files.
+# to build unique strings edit the module files instead
+# this file is just a shortcut to build strings which are the same
+
+\$self{texts} = {
+EOF
+
+    for $text (sort keys %alltext) {
+	my $translation = perl_encode($alltext{$text});
+	print "  '$text' => '$translation',\n"
+    }
+
+    print <<EOF;
+};
+
+1;
+EOF
+}
+
+sub po_encode {
+    $msg = shift;
+    $msg =~ s%\\%\\\\%g;
+    $msg =~ s%\"%\\\"%g;
+    $msg =~ s%\n%\\n%g;
+    return $msg;
+}
+
+sub as_po {
+    my ($filename, %alltext) = @_;
+
+    # Guessing on a charset.  It should be fetched from the original
+    # file itself, but it is missing in the sql-ledger all files.
+    my $charset = "ISO-9959-1";
+
+    # Prevent a wrapped line from beginning with a space
+    $Text::Wrap::break = qr/\n|\s(?=\S)/;
+
+    $Text::Wrap::columns = 72;
+    $Text::Wrap::huge = 'overflow';
+    $Text::Wrap::break = qr/\n|\s(?=\S)/;
+
+    print <<EOF;
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Copyright holder
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
+"Language-Team: LANGUAGE <LL@li.org>\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=$charset\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+
+EOF
+    for $text (sort keys %alltext) {
+	my $translation = po_encode($alltext{$text});
+	
+	my $id  = wrap("", " ", "msgid \"$text\"");
+	my $str = wrap("", " ", "msgstr \"$translation\"");
+	$id =~ s/\n / \"\n \"/g;
+	$str =~ s/\n / \"\n \"/g;
+	print "$id\n";
+	print "$str\n\n";
+    }
+}
+
+sub unescape_one_sequence
+{
+    my ($sequence) = @_;
+
+    return "\\" if $sequence eq "\\\\";
+    return "\"" if $sequence eq "\\\"";
+    return "\n" if $sequence eq "\\n";
+
+    # gettext also handles \n, \t, \b, \r, \f, \v, \a, \xxx (octal),
+    # \xXX (hex) and has a comment saying they want to handle \u and \U.
+
+    return $sequence;
+}
+
+sub unescape_po_string
+{
+    my ($string) = @_;
+
+    $string =~ s/(\\.)/unescape_one_sequence($1)/eg;
+
+    return $string;
+}
+
+sub load_po {
+    my $filename = shift;
+    my %alltext;
+    open(PO_FILE, "<$filename") || die "Unable to read from $filename";
+
+    my $nextfuzzy = 0;
+    my $inmsgid = 0;
+    my $inmsgstr = 0;
+    my $msgid = "";
+    my $msgstr = "";
+
+    while (<PO_FILE>)
+    {
+	$nextfuzzy = 1 if /^#, fuzzy/;
+
+	if (/^msgid "((\\.|[^\\])*)"/ )
+	{
+	    $alltext{$msgid} = $msgstr if $inmsgstr && $msgid && defined $msgstr;
+	    $msgid = "";
+	    $msgstr = "";
+
+	    if ($nextfuzzy) {
+		$inmsgid = 0;
+	    } else {
+		$msgid = unescape_po_string($1);
+		$inmsgid = 1;
+	    }
+	    $inmsgstr = 0;
+	    $nextfuzzy = 0;
+	}
+
+	if (/^msgstr "((\\.|[^\\])*)"/)
+	{
+	    $msgstr = unescape_po_string($1);
+	    $inmsgstr = 1;
+	    $inmsgid = 0;
+	}
+
+	if (/^ *"((\\.|[^\\])*)"/)
+	{
+	    $msgid .= unescape_po_string($1) if $inmsgid;
+	    $msgstr .= unescape_po_string($1) if $inmsgstr;
+	}
+    }
+    $alltext{$msgid} = $msgstr if $inmsgstr && $msgid && $msgstr;
+    return %alltext;
+}

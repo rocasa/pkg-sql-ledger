@@ -1,0 +1,113 @@
+#!/usr/bin/make -f
+# GNU copyright 2004 by Petter Reinholdtsen
+
+# This is the debhelper compatibility version to use.
+export DH_COMPAT=3
+
+include /usr/share/dpatch/dpatch.make
+
+TARBALL_VERSION = 2.4.7
+
+DEB_TARBALL = sql-ledger-$(TARBALL_VERSION).tar.gz
+
+DESTDIR = $(CURDIR)/debian/sql-ledger
+
+INSTALL = install
+
+build-tree = $(CURDIR)/BUILD
+
+unpack: unpack-stamp
+unpack-stamp: $(DEB_TARBALL)
+	touch unpack-stamp
+
+$(DEB_TARBALL): $(DEB_TARBALL)-stamp
+$(DEB_TARBALL)-stamp:
+	mkdir -p $(build-tree)
+	cd $(build-tree) && tar -zxf $(CURDIR)/$(DEB_TARBALL)
+	touch $@
+
+configure: configure-stamp
+configure-stamp: unpack patch-stamp
+	dh_testdir
+	# Add here commands to configure the package.
+
+	touch configure-stamp
+
+build: build-stamp
+
+build-stamp: configure-stamp 
+	dh_testdir
+
+	# Add here commands to compile the package.
+	$(MAKE) -C $(build-tree)/sql-ledger
+	#/usr/bin/docbook-to-man debian/sql-ledger.sgml > sql-ledger.1
+
+	touch build-stamp
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp unpack-stamp $(DEB_TARBALL)-stamp
+	rm -rf $(build-tree)
+
+	# Add here commands to clean up after the build process.
+	#-$(MAKE) -C $(build-tree)/sql-ledger clean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/sql-ledger.
+	$(MAKE) -C $(build-tree)/sql-ledger install DESTDIR=$(DESTDIR)
+
+	$(INSTALL) debian/sql-ledger-enable $(DESTDIR)/usr/sbin/
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf	
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installlogrotate
+#	dh_installinit
+	dh_installcron
+	dh_installman
+	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+# Generate new copyright file with the copyright info for each
+# translation as well as the package itself.
+debian/copyright: unpack patch-stamp
+	cat debian/copyright.pre > debian/copyright
+	set -e ; \
+	for file in $(build-tree)/sql-ledger/locale/*/COPYING ; do \
+	  HEAD=$$(grep -n '# This program is free software' $$file |cut -f1 -d:); \
+	  HEAD=`expr $$HEAD - 1`; \
+	  head -$$HEAD $$file | tail +4 ; \
+	done | grep -v '^#$$' | sed -e 's/^#[ 	]//' >> debian/copyright
+	cat debian/copyright.post >> debian/copyright
+
+.PHONY: build clean binary-indep binary-arch binary install configure

@@ -1,0 +1,126 @@
+sql-ledger (2.4.7-2) unstable; urgency=low
+
+  * Rewrite the new helper script sql-ledger-enable, to follow the
+    Debian apache config schema.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 25 Dec 2004 17:31:50 +0100
+
+sql-ledger (2.4.7-1) unstable; urgency=low
+
+  * New upstream version 2.4.7.
+    - Added string formatting for transaction printing.
+    - Fixed GL Report GIFI sorting error.
+    - Fixed multicompany login routine.
+    - Updated Finnish translation.
+    - Added tax included calculation to POS.
+  * Petter Reinholdtsen
+    - 40imagepath.dpatch: Updated patch for login.pl to match new
+      upstream version.
+    - Install new helper script /usr/sbin/sql-ledger-enable, taking
+      care of the apache config editing.  Not sure if this is the
+      best way to do it.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 25 Dec 2004 15:28:02 +0100
+
+sql-ledger (2.4.6-1) unstable; urgency=low
+
+  * New upstream version.
+  * Petter Reinholdtsen
+    - 20norwegian.dpatch: Removing.  The changes are now upstream.
+    - 40imagepath.dpatch: Updated admin.pl patch to match new upstream
+      version.
+    - Added script debian/all2po.  It can convert between gettext .po
+      files and the SQL-ledger translation files.  The script is sent
+      upstream.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sun,  5 Dec 2004 15:04:02 +0100
+
+sql-ledger (2.4.5-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #280766)
+    - Includes password confirm field and keeps working after the
+      password is changed. (Closes: #260122)
+  * Petter Reinholdtsen
+    - Improved short description slightly, dropping implementation
+      language and adding "web based".
+    - 10makefiles.dpatch: Add files arapprn.pl and pw.pl to MODULEs,
+         making sure they are included in the package.
+	 Added install rules for sql-ledger.eps. (Closes: #281692)
+    - 20norwegian.dpatch: Most of this patch is now included upstream.
+         Updated it to only include the remaining translations.
+    - 30defaults.dpatch: New patch. Use full path to location of user info.
+    - 40imagepath.dpatch, 45crosslink.dpatch: - Update to match new
+         source version.
+    - 45crosslink.dpatch: Add links between the normal and admin login pages.
+    - 50norwegian_chart.dpatch: Most of this was now included
+         upstream.  Redused to only include the remaining issues.
+    - 21norwegian.dpatch, 35http-redirect, 51norwegian_chart.dpatch:
+        Removed/merged into other patches.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Mon, 29 Nov 2004 21:35:31 +0100
+
+sql-ledger (2.4.1-2) unstable; urgency=low
+
+  * Updated Norwegian Bokmaal translation (20norwegian.dpatch).
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat,  7 Aug 2004 16:44:54 +0200
+
+sql-ledger (2.4.1-1) unstable; urgency=low
+
+  * Petter Reinholdtsen
+    - New upstream release.
+    - Made Norwegian Bokmaal translation patch relative to new upstream
+      version.  Updated translation based on input from Erik
+      Inge Bolsø. (20norwegian.dpatch)
+    - Corrected Norwegian general chart even further.  Patch
+      from Erik Inge Bolsø. (51norwegian_chart.dpatch)
+
+ -- Petter Reinholdtsen <pere@debian.org>  Thu,  5 Aug 2004 10:27:22 +0200
+
+sql-ledger (2.4.0-2) unstable; urgency=low
+
+  * Petter Reinholdtsen
+    - Updated Norwegian Bokmaal translation.
+    - Corrected Norwegian general chart.
+    - Add missing Build-Depends-Indep on dpatch. (Closes: #261042)
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 24 Jul 2004 23:19:45 +0200
+
+sql-ledger (2.4.0-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #252750)
+  * Rewrote build system to use dpatch and an untouced tarball.
+  * Correct file path in README.Debian. (Closes: #252595)
+  * Add /usr/lib/sql-ledger/index.html redirecting to
+    login.pl. (Closes: #258611)
+  * Changed suggests latex to tetex-extra, to make sure latex class
+    file 'scrartcl.cls' is available when the suggested package is
+    installed. (Closes: #248593)
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sun, 18 Jul 2004 14:02:27 +0200
+
+sql-ledger (2.2.6-1) unstable; urgency=low
+
+  * New upstream release (Closes: #245733)
+  * Changed to use symlinks from /usr/lib/sql-ledger and into
+    /var/lib/sql-ledger
+    (Closes: #245008, #245009)
+  * Changes dependencie on postgresql to suggest (Closes: #24493)
+
+ -- Finn-Arne Johansen <faj@bzz.no>  Mon, 10 May 2004 17:43:09 +0200
+
+sql-ledger (2.0.6-2) Never released; urgency=low
+
+  * Made the Makefiles so that it fits with <package>_<version>.orig.tar.gz
+
+ -- Finn-Arne Johansen <faj@bzz.no>  Wed, 21 Apr 2004 04:39:49 +0200
+
+sql-ledger (2.0.6-1) unstable; urgency=low
+
+  * Initial Release. (Closes: #129723, #138938)
+  * Fixed some errors to make it "lintian clean"
+  * Petter Reinholdtsen
+    - Removed (s) from copyright file to get rid of lintian warning
+      copyright-lists-upstream-authors-with-dh_make-boilerplate.
+
+ -- Finn-Arne Johansen <faj@bzz.no>  Sun, 21 Mar 2004 14:07:45 +0100

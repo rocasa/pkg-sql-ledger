@@ -1,0 +1,72 @@
+#! /bin/sh -e
+## 30defaults.dpatch by Petter Reinholdtsen <pere@hungry.com>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+##
+## DP: Default apache and sql-ledger configuration
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
+
+if [ $# -ne 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+       -patch)   ( cd BUILD/sql-ledger && patch $patch_opts -p1 ) < $0 ;;
+       -unpatch) ( cd BUILD/sql-ledger && patch $patch_opts -p1 -R ) < $0 ;;
+        *)
+                echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+                exit 1;;
+esac
+
+exit 0
+@DPATCH@
+--- sql-ledger-2.2.6.orig/etc/sql-ledger-httpd.conf
++++ sql-ledger-2.2.6/etc/sql-ledger-httpd.conf
+@@ -0,0 +1,9 @@
++Alias /sql-ledger/images/ /usr/share/sql-ledger/
++
++Alias /sql-ledger/ /usr/lib/sql-ledger/
++
++<Directory /usr/lib/sql-ledger>
++  AddHandler cgi-script .pl
++  Options ExecCGI Includes FollowSymlinks
++</Directory>
++
+--- sql-ledger-2.2.6.orig/etc/sql-ledger.conf
++++ sql-ledger-2.2.6/etc/sql-ledger.conf
+@@ -0,0 +1,33 @@
++use vars qw($userspath $memberfile $templates $sendmail $language $sid);
++
++# path to user configuration files
++# you may use an absolute path i.e. /var/tmp
++$userspath = "/var/lib/sql-ledger/users";
++
++# templates base directory; this one needs to be here for now
++$templates = "templates";
++
++# member file, could also be in "/usr/local/etc/slusers"
++$memberfile = "/var/lib/sql-ledger/users/members";
++
++# location of sendmail
++$sendmail = "| /usr/sbin/sendmail -t";
++
++# set language for login and admin; two letter code
++$language = "";
++
++# Oracle
++$sid = "T80509";
++$ENV{"ORACLE_HOME"} = "/usr/local/oracle";
++
++# if you have latex installed set to 1
++$latex = 1;
++
++# if the server can't find latex, dvips or pdflatex, add the path
++$ENV{PATH} .= ":/usr/local/bin";
++
++# on mac os X using Fink's Perl libs, add the path
++$ENV{PERL5LIB} .= ":/sw/lib/perl5";
++
++
++1;

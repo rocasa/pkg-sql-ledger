@@ -1,0 +1,115 @@
+This package was debianized by Finn-Arne Johansen <faj@bzz.no> on
+Sun,  4 May 2003 05:21:25 +0200.
+
+It was downloaded from http://prdownloads.sourceforge.net/sql-ledger/sql-ledger-2.0.6.tar.gz?download
+
+Upstream Author: Dieter Simader dsimader@sql-ledger.org
+
+Brazilian texts:
+ Author: Andre Felipe Machado <andremachado@techforce.com.br>
+         Miguel Koren O'Brien de Lacy <miguelk@konsultex.com.br>
+Simplified Chinese texts:
+ Author: Edmund Lian <elian@inbrief.net>
+Spanish texts:
+Adoption to Colombian Accounting Terms:
+Authors: 	Dirk Enrique Seiffert <info@caribenet.com> 
+	Lourdes Mejía Martinez <lourdes@caribenet.com>
+	Silfredo Godoy Chavez <silfredo@caribenet.com>
+
+Catalan Translation:
+ Author: Jaume Teixi <teixi@rocacorbit.com>
+Czech texts:
+ Author: Tomas Fencl <tomas.fencl@centrum.cz>
+German texts:
+ Author: Thomas Bayen <tbayen@bayen.de>
+         Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
+Danish texts:
+ Author: Keld Jørn Simonsen <keld@dkuug.dk>
+         Jonas Smedegaard <jonas@jones.dk>
+Estonian texts:
+ Author: Martin Lillepuu <martin@lillepuu.com>
+         Lauri Jesmin <jesmin@ut.ee>
+         Tanel Kurvits <rauge@hot.ee>
+Egypt Arabic texts:
+    Author: Omar BaheyEldin <o@ab2.com>
+            Rania Tayel
+#---- Please Use UTF-8 encoding
+#---- For some web servers you have to enable UTF-8
+#---- For Knoquere you have to edit the  font and use an arabic font
+--- Good Luck
+#--- Omar BaheyEldin
+British English texts:
+ Author:
+Spanish texts:
+ Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
+         John Stoddart <jstypo@imagencolor.com.ve>
+         Federico Montesino Pouzols <fedemp@arrok.com>
+         Tomás Pereira <topec@percar.com>
+Spanish texts:
+ Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
+         John Stoddart <jstypo@imagencolor.com.ve>
+         Federico Montesino Pouzols <fedemp@arrok.com>
+         Tomás Pereira <topec@percar.com>
+Finish texts:
+ Author: Petri Leppänen <mpj@mail.htk.fi>
+French texts:
+ Author: Sèbastien Brassard <sbrassar.cgocable.ca>
+         Oscar Buijten <oscar@elbie.com>
+         Wolfgang Sourdeau <wolfgang@contre.com>
+         Aguibou KONE <aguibou.kone@rocketmail.com>
+         Jens-Ingo Brodesser <jens-ingo@all2all.org>
+Hungarian texts:
+ Author: Kabai József <kabai@investor.hu>
+Icelandic texts:
+ Author: Margeir Reynisson <margeir@met.is>
+Italian texts:
+ Author: Paolo Bizzarri <p.bizzarri@icube.it>
+         Luca Venturini <luca@yepa.com>
+         Alessandro Pasotti <apasotti@isoleborromee.it>
+         Daniele Giacomini <daniele@swlibero.org> 2003.09.28-2003.11.05
+Lithuanian texts:
+ Author:
+Latvian texts:
+ Author: Kaspars Melkis <info@isolis.lv>
+Spanish texts (Mexico):
+ Author: Alberto Ladron <h@grupoh.com.mx>
+Dutch texts:
+ Author: AJ Hettema <Ignite@ecosse.net>
+         Oscar Buijten <oscar@elbie.com>
+         Bert Tijhuis <domino@dse.nl>
+         Paul Tammes <ptammes@home.nl>
+Norwegian texts:
+ Author: Keld Jørn Simonsen <keld@dkuug.dk>
+         Morten Pedersen <morten@workzone.no>
+         Finn-Arne Johansen <faj@bzz.no>
+         Petter Reinholdtsen <pere@hungry.com>
+Spanish texts:
+ Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
+Polish texts:
+ Author: Peter Dabrowski <meritage@mail.com>
+Portugese texts:
+ Author: Paulo Rodrigues <prodrigues@vianetworks.pt>
+Russian texts:
+ Author:
+Swedish texts:
+ Author: Jonny Larsson <jonny@lernbo.com>
+         Daniel Andersson <daniel@addelei.nu>
+Spanish texts:
+ Author: Carlos López Linares <chlopezl@yahoo.com>
+Turkish texts:
+ Author: Mufit Eribol <meribol@deltagrup.com.tr>
+Traditional Chinese texts:
+ Author: Edmund Lian <elian@inbrief.net>
+Ukrainian texts:
+Author: Ivan Petrouchtchak <impe@telus.net>
+Spanish Texts (Venezuela):
+ Author: John Stoddart <jstypo@imagencolor.com.ve>
+
+These scripts are free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+

@@ -1,0 +1,237 @@
+#! /bin/sh -e
+## 10makefiles.dpatch by Petter Reinholdtsen <pere@hungry.com>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+##
+## DP: Build/install rules for sql-ledger
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
+
+if [ $# -ne 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+       -patch)   ( cd BUILD/sql-ledger && patch $patch_opts -p1 ) < $0 ;;
+       -unpatch) ( cd BUILD/sql-ledger && patch $patch_opts -p1 -R ) < $0 ;;
+        *)
+                echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+                exit 1;;
+esac
+
+exit 0
+@DPATCH@
+--- sql-ledger-2.2.6.orig/bin/Makefile
++++ sql-ledger-2.2.6/bin/Makefile
+@@ -0,0 +1,22 @@
++PACKAGE = sql-ledger
++
++MODULES = admin.pl login.pl arap.pl arapprn.pl ap.pl ar.pl ca.pl cp.pl ct.pl gl.pl ic.pl \
++          ir.pl is.pl oe.pl pe.pl rc.pl rp.pl am.pl io.pl pos.pl ps.pl pw.pl bp.pl hr.pl
++SUBDIRS = js lynx mozilla
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/bin
++	cp -r $(SUBDIRS) $(DESTDIR)/usr/lib/sql-ledger/bin
++
++	for subdir in $(SUBDIRS) ; do \
++	  cp $$subdir/menu.pl $(DESTDIR)/usr/lib/sql-ledger/bin/$$subdir ; \
++	done
++	
++	cd $(DESTDIR)/usr/lib/sql-ledger ; \
++	for module in $(MODULES) ; do \
++	  (cd bin/lynx ; ln -sf ../mozilla/$$module) ;\
++	done  ; \
+--- sql-ledger-2.2.6.orig/doc/Makefile
++++ sql-ledger-2.2.6/doc/Makefile
+@@ -0,0 +1,13 @@
++PACKAGE = sql-ledger
++
++FILES	= README Makefile faq.html
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/usr/share/doc/sql-ledger
++	cp -a $(FILES) $(DESTDIR)/usr/share/doc/sql-ledger
++	
++#for ALL in locale/*/COPYING ; do HEAD=$(grep -n "# This program is free software" $ALL |cut -f1 -d:); let HEAD=$HEAD-1; head -$HEAD $ALL | tail +4 ; done | grep -v "^#$"
+--- sql-ledger-2.2.6.orig/sql/Makefile
++++ sql-ledger-2.2.6/sql/Makefile
+@@ -0,0 +1,11 @@
++PACKAGE = sql-ledger
++
++FILES = *.sql
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/sql
++	cp $(FILES) $(DESTDIR)/usr/lib/sql-ledger/sql
+--- sql-ledger-2.2.6.orig/templates/Makefile
++++ sql-ledger-2.2.6/templates/Makefile
+@@ -0,0 +1,14 @@
++PACKAGE = sql-ledger
++
++FILES	= *.html *.tex *.txt
++	  
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/var/lib/sql-ledger/templates
++	cp -a $(FILES) $(DESTDIR)/var/lib/sql-ledger/templates
++	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/templates
++	ln -sf /var/lib/sql-ledger/templates $(DESTDIR)/usr/lib/sql-ledger/
++	
+--- sql-ledger-2.2.6.orig/css/Makefile
++++ sql-ledger-2.2.6/css/Makefile
+@@ -0,0 +1,13 @@
++PACKAGE = sql-ledger
++
++FILES	= sql-ledger.css
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/var/lib/sql-ledger/css
++	cp $(FILES) $(DESTDIR)/var/lib/sql-ledger/css
++	chown -R www-data:www-data $(DESTDIR)/var/lib/sql-ledger/css
++	ln -sf /var/lib/sql-ledger/css $(DESTDIR)/usr/lib/sql-ledger/
+--- sql-ledger-2.2.6.orig/users/Makefile
++++ sql-ledger-2.2.6/users/Makefile
+@@ -0,0 +1,13 @@
++PACKAGE = sql-ledger
++
++FILES	= sql-ledger.eps  sql-ledger.png
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/var/lib/sql-ledger/users
++	cp -r $(FILES) $(DESTDIR)/var/lib/sql-ledger/users/
++	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/users
++	ln -sf /var/lib/sql-ledger/users $(DESTDIR)/usr/lib/sql-ledger/
+--- sql-ledger-2.2.6.orig/SL/Makefile
++++ sql-ledger-2.2.6/SL/Makefile
+@@ -0,0 +1,11 @@
++PACKAGE = sql-ledger
++
++FILES  := $(shell ls *.pm)
++
++all:
++
++clean:
++
++install:
++	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/SL
++	cp -r $(FILES) $(DESTDIR)/usr/lib/sql-ledger/SL
+--- sql-ledger-2.2.6.orig/locale/Makefile
++++ sql-ledger-2.2.6/locale/Makefile
+@@ -0,0 +1,43 @@
++PACKAGE = sql-ledger
++
++LOCALES	= $(shell ls */LANGUAGE | cut -d/ -f1)
++
++localedir  = /usr/lib/sql-ledger/locale
++dlocaledir = $(DESTDIR)$(localedir)
++srctopdir := $(shell pwd)/..
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(dlocaledir)
++	set -e ; \
++	for lang in $(LOCALES) ; do \
++	 mkdir -p $(dlocaledir)/$$lang ; \
++	 for file in `find $$lang/. -type f | grep -v COPYING`; do \
++	   if [ -f $$file ] ; then \
++	     cp $$file $(dlocaledir)/$$lang/. ; \
++	   fi ; \
++	 done ; \
++	 if [ -h $$lang/Num2text ] ; then  \
++	   ln -sf ../es/Num2text $(dlocaledir)/$$lang/Num2text ; \
++	 elif [ -h $$lang/Num2text ] ; then  \
++	   cp $$lang/Num2text $(dlocaledir)/$$lang/. ; \
++	 fi ; \
++	done
++	
++	cp de/locales.pl $(dlocaledir)/de
++	set -e ; for lang in $(LOCALES) ; do \
++	  if [ -d $(dlocaledir)/$$lang -a \
++	       -f $(dlocaledir)/$$lang/LANGUAGE -a \
++	       ! -f $(dlocaledir)/$$lang/locales.pl ] ; then \
++	    ln -sf ../de/locales.pl $(dlocaledir)/$$lang/locales.pl ;\
++	fi ; \
++	done
++	
++	set -e ; for lang in $(LOCALES) ; do \
++	  (cd $(dlocaledir)/$$lang && \
++	   perl -I $(srctopdir) ./locales.pl || exit 1) ; \
++	done
++
+--- sql-ledger-2.2.6.orig/Makefile
++++ sql-ledger-2.2.6/Makefile
+@@ -0,0 +1,31 @@
++PACKAGE = sql-ledger
++
++MODULES = ap.pl ar.pl ca.pl cp.pl ct.pl gl.pl ic.pl \
++          ir.pl is.pl menu.pl oe.pl pe.pl rc.pl ps.pl rp.pl bp.pl hr.pl
++SUBDIRS = bin doc SL locale sql templates users etc css
++
++LIB_FILES = am.pl favicon.ico login.pl menu.ini setup.pl \
++            sql-ledger.conf.default VERSION index.html
++
++SHR_FILES = sql-ledger.png sql-ledger.gif
++
++all:
++
++install: 
++	mkdir -p $(DESTDIR)/usr/lib/sql-ledger
++	cp  $(LIB_FILES) $(DESTDIR)/usr/lib/sql-ledger
++	mkdir -p $(DESTDIR)/usr/share/sql-ledger
++	cp $(SHR_FILES) $(DESTDIR)/usr/share/sql-ledger
++
++	cd $(DESTDIR)/usr/lib/sql-ledger ; \
++	ln -sf login.pl admin.pl ; \
++	set -e ; for module in $(MODULES) ; do \
++	  ln -s am.pl $$module ; \
++	done ; \
++	ln -sf /etc/sql-ledger/sql-ledger.conf 
++
++	set -e ; for subdir in $(SUBDIRS) ; do \
++	  $(MAKE) -C $$subdir $@ ; \
++	done
++
++clean:
+--- sql-ledger-2.2.6.orig/etc/Makefile
++++ sql-ledger-2.2.6/etc/Makefile
+@@ -0,0 +1,12 @@
++PACKAGE = sql-ledger
++
++FILES	= sql-ledger-httpd.conf sql-ledger.conf
++
++all:
++
++clean:
++
++install: 
++	mkdir -p $(DESTDIR)/etc/sql-ledger
++	cp $(FILES) $(DESTDIR)/etc/sql-ledger
++	

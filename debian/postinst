@@ -1,0 +1,9 @@
+#!/bin/sh
+
+(
+  cd /var/lib/sql-ledger ; 
+  chown www-data:www-data users templates
+  chown -R www-data:www-data css
+)
+
+#DEBHELPER#

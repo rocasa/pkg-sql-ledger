@@ -1,0 +1,5 @@
+etc/sql-ledger
+usr/lib/sql-ledger
+usr/sbin
+usr/share/sql-ledger
+var/lib/sql-ledger
