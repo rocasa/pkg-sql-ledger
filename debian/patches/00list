@@ -1,12 +1,6 @@
 #
 # List of patches to apply.
 #
-05sessionid
-05dirtraversal
-06newwindowfix
-07remote-exec
 10makefiles
-30defaults
 40imagepath
 45crosslink
-50norwegian_chart

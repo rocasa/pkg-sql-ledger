@@ -1,12 +1,60 @@
-sql-ledger (2.4.7-2sarge1) stable-security; urgency=high
+sql-ledger (2.6.4-1) unstable; urgency=low
 
-  * Security upload.
-  * Fix bad handling of sessionid: CVE-2006-4244
-    Closes: #386519 (backported from 2.6.18)
-  * Fix directory traversal security issues (backported from 2.6.19)
-  * Fix a remote execution vulnerability too (backported from 2.6.21).
+  [ Raphael Hertzog ]
+  * New upstream version. Closes: #346195
+  * Added all members of the team in the Uploaders field (myself included).
+  * Build-Depends on debhelper >= 4 since we use debian/compat with level 4.
+  * Remove rsync build dependency (seems useless).
+  * Upgraded Standards-Version to 3.6.2 (no changes needed).
+  * Wrote plans for the future in debian/TODO.
+  * Update 10makefiles.dpatch because new modules have been added in the
+    upstream source package. Make it generate the list of modules
+    automatically.
+  * Reworked debian/rules so that we can have an .orig.tar.gz which is
+    the exact copy provided by upstream. Keep dpatch to apply patches
+    at build time however.
 
- -- Raphael Hertzog <hertzog@debian.org>  Sun, 26 Nov 2006 11:00:57 +0000
+ -- Raphael Hertzog <hertzog@debian.org>  Wed,  4 Jan 2006 23:12:35 +0000
+
+sql-ledger (2.6.3-1) UNRELEASED; urgency=low
+
+  * New upstream version available (Closes: #303604)
+  * Updated debian/patches/40imagepath.dpatch to avoid patch rejection
+  * Removed reference to script debian/sql-ledger-enable on
+    debian/rules
+  * Removed reference to js directory from file
+    debian/patches/10makefiles.dpatch as this directory was removed
+    upstream.
+
+ -- Gerardo Reynoso <greynoso@tindes.com>  Fri,  2 Dec 2005 21:00:26 -0600
+
+sql-ledger (2.4.9-3) UNRELEASED; urgency=low
+
+  * Move contents of debian/sql-ledger-enable into debian/postinst to avoid
+    lintian/linda warning about missing man page
+
+ -- Gerardo Reynoso <greynoso@tindes.com>  Fri,  2 Dec 2005 20:25:42 -0600
+
+sql-ledger (2.4.9-2) UNRELEASED; urgency=low
+
+  * package description typo(s) and the like (Closes: #300043)
+
+ -- Gerardo Reynoso <greynoso@tindes.com>  Fri,  2 Dec 2005 20:08:19 -0600
+
+sql-ledger (2.4.9-1) UNRELEASED; urgency=low
+
+  * New upstream release. (Closes: #303604)
+  * Added debian/watch file to detect new versions.
+  * Drop 50norwegian_chart.dpatch as it only insed a duplicate entry
+    into the chart file.  (Closes: #300204)
+  * Moved the content of 30default.dpatch into 10makefiles.dpatch, and
+    moved the files from sql-ledger/etc/ to sql-ledger/ to get the
+    sql-ledger.conf files closer to sql-ledger.conf.default.  A future
+    improvement is to change this to patch and install
+    sql-ledger.conf.default instead of creating a new file
+    sql-ledger.conf. Related to bug #296293.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sun, 17 Apr 2005 10:29:07 +0200
 
 sql-ledger (2.4.7-2) unstable; urgency=low
 

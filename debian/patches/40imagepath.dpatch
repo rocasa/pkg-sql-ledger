@@ -13,8 +13,8 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 case "$1" in
-       -patch)   ( cd BUILD/sql-ledger && patch $patch_opts -p1 ) < $0 ;;
-       -unpatch) ( cd BUILD/sql-ledger && patch $patch_opts -p1 -R ) < $0 ;;
+       -patch)   ( patch $patch_opts -p1 ) < $0 ;;
+       -unpatch) ( patch $patch_opts -p1 -R ) < $0 ;;
         *)
                 echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
                 exit 1;;
@@ -22,29 +22,29 @@ esac
 
 exit 0
 @DPATCH@
-diff -ur sql-ledger-2.4.5/bin/mozilla/am.pl BUILD/sql-ledger/bin/mozilla/am.pl
---- sql-ledger-2.4.5/bin/mozilla/am.pl	Fri Nov  5 04:53:55 2004
-+++ sql-ledger/bin/mozilla/am.pl	Mon Nov 29 20:37:08 2004
-@@ -2349,7 +2349,7 @@
- 
+diff -ur sql-ledger/bin/mozilla/am.pl BUILD/sql-ledger/bin/mozilla/am.pl
+--- sql-ledger/bin/mozilla/am.pl        2005-12-02 21:37:33.000000000 -0600
++++ BUILD/sql-ledger/bin/mozilla/am.pl  2005-12-02 21:47:18.000000000 -0600
+@@ -2523,7 +2523,7 @@
+
  </pre>
  <center>
--<a href="http://www.sql-ledger.org" target=_top><img src=sql-ledger.gif border=0></a>
+-<a href="http://www.sql-ledger.org" target=_top><img src=sql-ledger.gif border=0>&trade;</a>
 +<a href="http://www.sql-ledger.org" target=_top><img src="images/sql-ledger.png" border=0></a>
  <h1 class=login>|.$locale->text('Version').qq| $form->{version}</h1>
- 
+
  <p>
 diff -ur sql-ledger/bin/mozilla/admin.pl BUILD/sql-ledger/bin/mozilla/admin.pl
---- sql-ledger-2.4.5/bin/mozilla/admin.pl	Tue Nov 23 22:56:46 2004
-+++ sql-ledger/bin/mozilla/admin.pl	Sat Nov 27 21:35:55 2004
-@@ -104,7 +104,7 @@
- 
+--- sql-ledger/bin/mozilla/admin.pl     2005-12-02 21:37:50.000000000 -0600
++++ BUILD/sql-ledger/bin/mozilla/admin.pl       2005-12-02 21:49:27.000000000 -0600
+@@ -102,7 +102,7 @@
+
  <div align=center>
- 
--<a href="http://www.sql-ledger.org"><img src=sql-ledger.png border=0>&trade;</a>
+
+-<a href="http://www.sql-ledger.org"><img src=sql-ledger.gif border=0>&trade;</a>
 +<a href="http://www.sql-ledger.org"><img src="images/sql-ledger.png" border=0>&trade;</a>
  <h1 class=login>|.$locale->text('Version').qq| $form->{version}<p>|.$locale->text('Administration').qq|</h1>
- 
+
  <form method=post action="$form->{script}" name=admin>
 diff -ur sql-ledger/bin/mozilla/login.pl BUILD/sql-ledger/bin/mozilla/login.pl
 --- sql-ledger-2.4.5/bin/mozilla/login.pl	Fri Nov  5 05:15:38 2004

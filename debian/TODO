@@ -1,11 +1,26 @@
-cp users/ templates/ /var/lib/sql-ledger/
-cp/edit sql-ledger-default.conf /etc/sql-ledger/sql-ledger.conf
-create /etc/sql-ledger/sql-ledger-httpd.conf
-edit /etc/apache(-ssl)/http.conf to include sql-ledger-httpd.conf
-cp bin/ /usr/lib/sql-ledger/bin
-cd bin/lynx for ALL in ../mozilla/*.pl ; do ln -s $ALL ; done 
-cp -r ~/MY-CVS/sql-ledger/SL . 
-chown www-data:www-data users templates
-cp -r ~/MY-CVS/sql-ledger/sql .
-cp -r ~/MY-CVS/sql-ledger/locale . 
+
+1/ Improve README.Debian to provide reliable secure instructions.
+
+2/ Automatize as much as possible:
+   - add plpgsql support in "template1" db automatically
+   - create a "sql-ledger" user in Postgres (password should be requested
+     by debconf)
+   - configure PostgreSQL to use password authentication for "sql-ledger"
+     user by default :
+     Currenly this means adding a line in pg_hba.conf:
+     local   all         sql-ledger                          md5
+     This line should be before the lines:
+     # "local" is for Unix domain socket connections only
+     local   all         all                               ident sameuser
+
+3/ Upstream docs speak of locking SQL-ledger during "manual upgrades". Maybe
+   we should do that automatically: lock in preinst, unlock in postinst.
+   If the upgrade involves a new upstream version, we could decide to not
+   unlock to make sure that the administrator upgrades the database by
+   logging itself and then unlocking the DB manually. Otherwise we might
+   have "active sessions" working with the new code but with the old
+   database.
+
+4/ Starting from now (v2.6.4), anything described in various UPGRADE-*
+   files should be done automatically if at all possible.
 

@@ -13,8 +13,8 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 case "$1" in
-       -patch)   ( cd BUILD/sql-ledger && patch $patch_opts -p1 ) < $0 ;;
-       -unpatch) ( cd BUILD/sql-ledger && patch $patch_opts -p1 -R ) < $0 ;;
+       -patch)   ( patch $patch_opts -p1 ) < $0 ;;
+       -unpatch) ( patch $patch_opts -p1 -R ) < $0 ;;
         *)
                 echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
                 exit 1;;
@@ -24,12 +24,12 @@ exit 0
 @DPATCH@
 --- sql-ledger-2.2.6.orig/bin/Makefile
 +++ sql-ledger-2.2.6/bin/Makefile
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,18 @@
 +PACKAGE = sql-ledger
 +
-+MODULES = admin.pl login.pl arap.pl arapprn.pl ap.pl ar.pl ca.pl cp.pl ct.pl gl.pl ic.pl \
-+          ir.pl is.pl oe.pl pe.pl rc.pl rp.pl am.pl io.pl pos.pl ps.pl pw.pl bp.pl hr.pl
-+SUBDIRS = js lynx mozilla
++# Assumption: only the menu.pl differs between each directory
++MODULES = $(shell find mozilla/ -name '*.pl' | sed -e 's|mozilla/||' | grep -v menu.pl) 
++SUBDIRS = lynx mozilla
 +
 +all:
 +
@@ -39,14 +39,10 @@ exit 0
 +	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/bin
 +	cp -r $(SUBDIRS) $(DESTDIR)/usr/lib/sql-ledger/bin
 +
-+	for subdir in $(SUBDIRS) ; do \
-+	  cp $$subdir/menu.pl $(DESTDIR)/usr/lib/sql-ledger/bin/$$subdir ; \
-+	done
-+	
 +	cd $(DESTDIR)/usr/lib/sql-ledger ; \
 +	for module in $(MODULES) ; do \
 +	  (cd bin/lynx ; ln -sf ../mozilla/$$module) ;\
-+	done  ; \
++	done ;
 --- sql-ledger-2.2.6.orig/doc/Makefile
 +++ sql-ledger-2.2.6/doc/Makefile
 @@ -0,0 +1,13 @@
@@ -188,17 +184,19 @@ exit 0
 +
 --- sql-ledger-2.2.6.orig/Makefile
 +++ sql-ledger-2.2.6/Makefile
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,36 @@
 +PACKAGE = sql-ledger
 +
-+MODULES = ap.pl ar.pl ca.pl cp.pl ct.pl gl.pl ic.pl \
-+          ir.pl is.pl menu.pl oe.pl pe.pl rc.pl ps.pl rp.pl bp.pl hr.pl
-+SUBDIRS = bin doc SL locale sql templates users etc css
++# Assumption: all .pl except am/login/admin/setup are modules
++MODULES = $(shell ls *.pl | grep -v -E '(am|login|admin|setup)\.pl')
++SUBDIRS = bin doc SL locale sql templates users css
 +
 +LIB_FILES = am.pl favicon.ico login.pl menu.ini setup.pl \
 +            sql-ledger.conf.default VERSION index.html
 +
 +SHR_FILES = sql-ledger.png sql-ledger.gif
++
++CFG_FILES = sql-ledger-httpd.conf sql-ledger.conf
 +
 +all:
 +
@@ -219,19 +217,69 @@ exit 0
 +	  $(MAKE) -C $$subdir $@ ; \
 +	done
 +
-+clean:
---- sql-ledger-2.2.6.orig/etc/Makefile
-+++ sql-ledger-2.2.6/etc/Makefile
-@@ -0,0 +1,12 @@
-+PACKAGE = sql-ledger
-+
-+FILES	= sql-ledger-httpd.conf sql-ledger.conf
-+
-+all:
-+
-+clean:
-+
-+install: 
 +	mkdir -p $(DESTDIR)/etc/sql-ledger
-+	cp $(FILES) $(DESTDIR)/etc/sql-ledger
-+	
++	cp $(CFG_FILES) $(DESTDIR)/etc/sql-ledger
++
++clean:
+--- sql-ledger-2.2.6.orig/sql-ledger-httpd.conf
++++ sql-ledger-2.2.6/sql-ledger-httpd.conf
+@@ -0,0 +1,8 @@
++Alias /sql-ledger/images/ /usr/share/sql-ledger/
++
++Alias /sql-ledger/ /usr/lib/sql-ledger/
++
++<Directory /usr/lib/sql-ledger>
++  AddHandler cgi-script .pl
++  Options ExecCGI Includes FollowSymlinks
++</Directory>
+--- sql-ledger-2.2.6.orig/sql-ledger.conf
++++ sql-ledger-2.2.6/sql-ledger.conf
+@@ -0,0 +1,48 @@
++use vars qw($userspath $spool $memberfile $templates $sendmail $language $sid $latex %printer $gzip);
++
++# path to user configuration files
++$userspath = "/var/lib/sql-ledger/users";
++
++# spool directory for batch printing
++$spool = "spool";
++
++# templates base directory
++$templates = "templates";
++
++# member file
++$memberfile = "/var/lib/sql-ledger/users/members";
++
++# location of sendmail
++$sendmail = "| /usr/sbin/sendmail -t";
++
++# set language for login and admin
++$language = "";
++
++# Oracle
++#$sid = "T80509";
++#$ENV{"ORACLE_HOME"} = "/usr/local/oracle";
++
++# if you have latex installed set to 1
++$latex = 1;
++
++# available printers
++%printer = ( Laserjet	=> 'lpr -Plaserjet',
++             Laser	=> 'lpr -Plaser'
++            );
++
++# program to use for file compression
++$gzip = "gzip -S .gz";
++
++# if the server can't find gzip, latex, dvips or pdflatex, add the path
++$ENV{PATH} .= ":/usr/local/bin";
++
++# on mac os X using Fink's Perl libs, add the path
++#$ENV{PERL5LIB} .= ":/sw/lib/perl5";
++
++# DB2, Default dataset is expected to be LEDGER
++#$ENV{DB2INSTANCE} = "db2inst1";
++#$ENV{DB2_HOME} = "/opt/IBM/db2/V8.1/";
++
++
++1;
++
