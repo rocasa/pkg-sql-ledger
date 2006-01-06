@@ -1,3 +1,6 @@
+Known bugs :
+- postinst doesn't handle well apache2. It tries to create /etc/apache/httpd.conf 
+  => Make use of "wwwconfig-common" to be nicer about apache configuration ?
 
 1/ Improve README.Debian to provide reliable secure instructions.
 

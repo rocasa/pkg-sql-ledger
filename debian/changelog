@@ -1,3 +1,15 @@
+sql-ledger (2.6.5-1) unstable; urgency=low
+
+  [ Raphael Hertzog ]
+  * New upstream version.
+    - added WITH OIDS to some tables (PostgreSQL 8.0+ changed the default from
+      using OIDS to not use them)
+    - fixed notes printing for lineitems
+    - fixed path for logo in Default templates
+    - updated Brazilian Portuguese translation and templates
+
+ -- Raphael Hertzog <hertzog@debian.org>  Fri,  6 Jan 2006 11:33:36 +0000
+
 sql-ledger (2.6.4-1) unstable; urgency=low
 
   [ Raphael Hertzog ]

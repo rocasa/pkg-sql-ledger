@@ -199,6 +199,36 @@ sub post_invoice {
       $amount = $form->round_amount($linetotal, 2);
       $allocated = 0;
 
+      # adjust and round sellprice
+      $form->{"sellprice_$i"} = $form->round_amount($form->{"sellprice_$i"} * $form->{exchangerate}, $decimalplaces);
+
+      # save detail record in invoice table
+      $query = qq|INSERT INTO invoice (description)
+                  VALUES ('$uid')|;
+      $dbh->do($query) || $form->dberror($query);
+
+      $query = qq|SELECT id FROM invoice
+                  WHERE description = '$uid'|;
+      ($invoice_id) = $dbh->selectrow_array($query);
+
+      $query = qq|UPDATE invoice SET
+                  trans_id = $form->{id},
+		  parts_id = $form->{"id_$i"},
+		  description = |.$dbh->quote($form->{"description_$i"}).qq|,
+		  qty = $form->{"qty_$i"} * -1,
+		  sellprice = $form->{"sellprice_$i"},
+		  fxsellprice = $fxsellprice,
+		  discount = $form->{"discount_$i"},
+		  allocated = $allocated,
+		  unit = |.$dbh->quote($form->{"unit_$i"}).qq|,
+		  deliverydate = |.$form->dbquote($form->{"deliverydate_$i"}, SQL_DATE).qq|,
+		  project_id = $project_id,
+		  serialnumber = |.$dbh->quote($form->{"serialnumber_$i"}).qq|,
+		  notes = |.$dbh->quote($form->{"notes_$i"}).qq|
+		  WHERE id = $invoice_id|;
+      $dbh->do($query) || $form->dberror($query);
+      
+
       if ($form->{"inventory_accno_id_$i"}) {
 
 	# add purchase to inventory
@@ -207,10 +237,9 @@ sub post_invoice {
 	  amount => $amount,
 	  fxgrossamount => $fxlinetotal + $form->round_amount($fxtax, 2),
 	  grossamount => $grossamount,
-	  project_id => $project_id };
+	  project_id => $project_id,
+	  invoice_id => $invoice_id };
 	
-        # adjust and round sellprice
-	$form->{"sellprice_$i"} = $form->round_amount($form->{"sellprice_$i"} * $form->{exchangerate}, $decimalplaces);
 	
 	$updparts{$form->{"id_$i"}} = 1;
 
@@ -250,17 +279,18 @@ sub post_invoice {
 	  # add entry for inventory, this one is for the sold item
 	  if ($linetotal) {
 	    $query = qq|INSERT INTO acc_trans (trans_id, chart_id, amount, 
-			transdate, project_id)
+			transdate, project_id, invoice_id)
 			VALUES ($ref->{trans_id}, $ref->{inventory_accno_id},
-			$linetotal, '$ref->{transdate}', $ref->{project_id})|;
+			$linetotal, '$ref->{transdate}', $ref->{project_id},
+			$invoice_id )|;
 	    $dbh->do($query) || $form->dberror($query);
 
 	    # add expense
 	    $query = qq|INSERT INTO acc_trans (trans_id, chart_id, amount, 
-			transdate, project_id)
+			transdate, project_id, invoice_id)
 			VALUES ($ref->{trans_id}, $ref->{expense_accno_id},
 			|. ($linetotal * -1) .qq|, '$ref->{transdate}',
-			$ref->{project_id})|;
+			$ref->{project_id}, $invoice_id)|;
 	    $dbh->do($query) || $form->dberror($query);
 	  }
       
@@ -286,42 +316,10 @@ sub post_invoice {
 	  amount => $amount,
 	  fxgrossamount => $fxlinetotal + $form->round_amount($fxtax, 2),
 	  grossamount => $grossamount,
-	  project_id => $project_id };
-	
-        # adjust and round sellprice
-        $form->{"sellprice_$i"} = $form->round_amount($form->{"sellprice_$i"} * $form->{exchangerate}, $decimalplaces);
+	  project_id => $project_id,
+	  invoice_id => $invoice_id };
 	
       }
-
-      # save detail record in invoice table
-      $query = qq|INSERT INTO invoice (description)
-                  VALUES ('$uid')|;
-      $dbh->do($query) || $form->dberror($query);
-
-      $query = qq|SELECT id FROM invoice
-                  WHERE description = '$uid'|;
-      ($invoice_id) = $dbh->selectrow_array($query);
-
-      $query = qq|UPDATE invoice SET
-                  trans_id = $form->{id},
-		  parts_id = $form->{"id_$i"},
-		  description = |.$dbh->quote($form->{"description_$i"}).qq|,
-		  qty = $form->{"qty_$i"} * -1,
-		  sellprice = $form->{"sellprice_$i"},
-		  fxsellprice = $fxsellprice,
-		  discount = $form->{"discount_$i"},
-		  allocated = $allocated,
-		  unit = |.$dbh->quote($form->{"unit_$i"}).qq|,
-		  deliverydate = |.$form->dbquote($form->{"deliverydate_$i"}, SQL_DATE).qq|,
-		  project_id = $project_id,
-		  serialnumber = |.$dbh->quote($form->{"serialnumber_$i"}).qq|,
-		  notes = |.$dbh->quote($form->{"notes_$i"}).qq|
-		  WHERE id = $invoice_id|;
-      $dbh->do($query) || $form->dberror($query);
-      
-      # add invoice_id
-      $form->{acc_trans}{lineitems}[$#{@{$form->{acc_trans}{lineitems}}}]->{invoice_id} = $invoice_id;
-      
     }
   }
 
