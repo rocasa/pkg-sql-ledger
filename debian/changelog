@@ -1,3 +1,17 @@
+sql-ledger (2.6.6-1) unstable; urgency=low
+
+  [ Raphael Hertzog ]
+  * New upstream version.
+  * Added all CSS files in the "css" directory. Modified
+    debian/patches/10makefiles.patch.
+  * Added all files from the doc directory except COPYING and COPYRIGHT.
+    This includes in particular the various "UPGRADE-*" files.
+  * Use hardlinks instead of symlinks. This is better for suExec
+    compatibility (on advice from the author). This generates lintian
+    warnings. Put overrides until bug 348978 is fixed.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Fri, 20 Jan 2006 07:48:35 +0000
+
 sql-ledger (2.6.5-1) unstable; urgency=low
 
   [ Raphael Hertzog ]

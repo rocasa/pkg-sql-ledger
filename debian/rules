@@ -41,6 +41,9 @@ install: build
 
 	# Add here commands to install the package into debian/sql-ledger.
 	$(MAKE) install DESTDIR=$(DESTDIR)
+	# Install lintian overrides
+	mkdir -p $(DESTDIR)/usr/share/lintian/overrides/
+	cp debian/sql-ledger.lintian-overrides $(DESTDIR)/usr/share/lintian/overrides/sql-ledger
 
 
 # Build architecture-independent files here.

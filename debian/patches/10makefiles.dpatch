@@ -41,14 +41,14 @@ exit 0
 +
 +	cd $(DESTDIR)/usr/lib/sql-ledger ; \
 +	for module in $(MODULES) ; do \
-+	  (cd bin/lynx ; ln -sf ../mozilla/$$module) ;\
++	  (cd bin/lynx ; ln -f ../mozilla/$$module) ;\
 +	done ;
 --- sql-ledger-2.2.6.orig/doc/Makefile
 +++ sql-ledger-2.2.6/doc/Makefile
 @@ -0,0 +1,13 @@
 +PACKAGE = sql-ledger
 +
-+FILES	= README Makefile faq.html
++FILES	= $(shell ls * | grep -v Makefile | grep -v COPYING | grep -v COPYRIGHT)
 +
 +all:
 +
@@ -95,7 +95,7 @@ exit 0
 @@ -0,0 +1,13 @@
 +PACKAGE = sql-ledger
 +
-+FILES	= sql-ledger.css
++FILES	= $(shell ls sql-ledger*.css)
 +
 +all:
 +
@@ -207,9 +207,9 @@ exit 0
 +	cp $(SHR_FILES) $(DESTDIR)/usr/share/sql-ledger
 +
 +	cd $(DESTDIR)/usr/lib/sql-ledger ; \
-+	ln -sf login.pl admin.pl ; \
++	ln -f login.pl admin.pl ; \
 +	set -e ; for module in $(MODULES) ; do \
-+	  ln -s am.pl $$module ; \
++	  ln am.pl $$module ; \
 +	done ; \
 +	ln -sf /etc/sql-ledger/sql-ledger.conf 
 +
