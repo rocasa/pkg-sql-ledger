@@ -30,6 +30,7 @@ clean: unpatch
 
 	# Add here commands to clean up after the build process.
 	#-$(MAKE) clean
+	rm -f sql-ledger.conf
 
 	dh_clean
 
@@ -40,6 +41,10 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/sql-ledger.
+	sed -e 's|^\$$userspath = .*$$|$$userspath = "/var/lib/sql-ledger/users";|' \
+	    -e 's|^\$$memberfile = .*$$|$$memberfile = "/var/lib/sql-ledger/users/members";|' \
+	sql-ledger.conf.default > sql-ledger.conf
+	
 	$(MAKE) install DESTDIR=$(DESTDIR)
 	# Install lintian overrides
 	mkdir -p $(DESTDIR)/usr/share/lintian/overrides/
@@ -62,7 +67,7 @@ binary-arch: build install
 	dh_installman
 	dh_installinfo
 	dh_installchangelogs 
-	dh_link
+	dh_link /usr/share/sql-ledger /usr/lib/sql-ledger
 	dh_strip
 	dh_compress
 	dh_fixperms

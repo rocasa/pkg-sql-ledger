@@ -1,0 +1,10 @@
+sql-ledger (2.6.6-2) unstable; urgency=low
+
+  SQL-Ledger is now installed in /usr/share/sql-ledger instead of
+  /usr/lib/sql-ledger. The default apache configuration has been
+  correspondingly updated. Please update the path if you have
+  other instances configured in Apache. A temporary symlink
+  has been put in place to avoid potential breakages, but it will
+  be removed one day.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Fri, 20 Jan 2006 19:52:39 +0000

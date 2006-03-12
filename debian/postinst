@@ -6,6 +6,11 @@
   chown -R www-data:www-data css
 )
 
+if ! test -L /usr/lib/sql-ledger; then
+    # Work around dpkg bug (can't replace dir by symlink itself)
+    (rmdir /usr/lib/sql-ledger && ln -sf /usr/share/sql-ledger /usr/lib/sql-ledger) || \
+    echo "WARNING: Unable to replace /usr/lib/sql-ledger by a symlink"
+fi
 
 #
 # Activate SQL-Ledger in apache configuration.  Small helper script

@@ -36,10 +36,10 @@ exit 0
 +clean:
 +
 +install: 
-+	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/bin
-+	cp -r $(SUBDIRS) $(DESTDIR)/usr/lib/sql-ledger/bin
++	mkdir -p $(DESTDIR)/usr/share/sql-ledger/bin
++	cp -r $(SUBDIRS) $(DESTDIR)/usr/share/sql-ledger/bin
 +
-+	cd $(DESTDIR)/usr/lib/sql-ledger ; \
++	cd $(DESTDIR)/usr/share/sql-ledger ; \
 +	for module in $(MODULES) ; do \
 +	  (cd bin/lynx ; ln -f ../mozilla/$$module) ;\
 +	done ;
@@ -71,8 +71,8 @@ exit 0
 +clean:
 +
 +install: 
-+	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/sql
-+	cp $(FILES) $(DESTDIR)/usr/lib/sql-ledger/sql
++	mkdir -p $(DESTDIR)/usr/share/sql-ledger/sql
++	cp $(FILES) $(DESTDIR)/usr/share/sql-ledger/sql
 --- sql-ledger-2.2.6.orig/templates/Makefile
 +++ sql-ledger-2.2.6/templates/Makefile
 @@ -0,0 +1,14 @@
@@ -88,7 +88,7 @@ exit 0
 +	mkdir -p $(DESTDIR)/var/lib/sql-ledger/templates
 +	cp -a $(FILES) $(DESTDIR)/var/lib/sql-ledger/templates
 +	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/templates
-+	ln -sf /var/lib/sql-ledger/templates $(DESTDIR)/usr/lib/sql-ledger/
++	ln -sf /var/lib/sql-ledger/templates $(DESTDIR)/usr/share/sql-ledger/
 +	
 --- sql-ledger-2.2.6.orig/css/Makefile
 +++ sql-ledger-2.2.6/css/Makefile
@@ -105,7 +105,7 @@ exit 0
 +	mkdir -p $(DESTDIR)/var/lib/sql-ledger/css
 +	cp $(FILES) $(DESTDIR)/var/lib/sql-ledger/css
 +	chown -R www-data:www-data $(DESTDIR)/var/lib/sql-ledger/css
-+	ln -sf /var/lib/sql-ledger/css $(DESTDIR)/usr/lib/sql-ledger/
++	ln -sf /var/lib/sql-ledger/css $(DESTDIR)/usr/share/sql-ledger/
 --- sql-ledger-2.2.6.orig/users/Makefile
 +++ sql-ledger-2.2.6/users/Makefile
 @@ -0,0 +1,13 @@
@@ -121,7 +121,7 @@ exit 0
 +	mkdir -p $(DESTDIR)/var/lib/sql-ledger/users
 +	cp -r $(FILES) $(DESTDIR)/var/lib/sql-ledger/users/
 +	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/users
-+	ln -sf /var/lib/sql-ledger/users $(DESTDIR)/usr/lib/sql-ledger/
++	ln -sf /var/lib/sql-ledger/users $(DESTDIR)/usr/share/sql-ledger/
 --- sql-ledger-2.2.6.orig/SL/Makefile
 +++ sql-ledger-2.2.6/SL/Makefile
 @@ -0,0 +1,11 @@
@@ -134,8 +134,8 @@ exit 0
 +clean:
 +
 +install:
-+	mkdir -p $(DESTDIR)/usr/lib/sql-ledger/SL
-+	cp -r $(FILES) $(DESTDIR)/usr/lib/sql-ledger/SL
++	mkdir -p $(DESTDIR)/usr/share/sql-ledger/SL
++	cp -r $(FILES) $(DESTDIR)/usr/share/sql-ledger/SL
 --- sql-ledger-2.2.6.orig/locale/Makefile
 +++ sql-ledger-2.2.6/locale/Makefile
 @@ -0,0 +1,43 @@
@@ -143,7 +143,7 @@ exit 0
 +
 +LOCALES	= $(shell ls */LANGUAGE | cut -d/ -f1)
 +
-+localedir  = /usr/lib/sql-ledger/locale
++localedir  = /usr/share/sql-ledger/locale
 +dlocaledir = $(DESTDIR)$(localedir)
 +srctopdir := $(shell pwd)/..
 +
@@ -192,21 +192,21 @@ exit 0
 +SUBDIRS = bin doc SL locale sql templates users css
 +
 +LIB_FILES = am.pl favicon.ico login.pl menu.ini setup.pl \
-+            sql-ledger.conf.default VERSION index.html
++            sql-ledger.conf.default VERSION index.html \
++            sql-ledger.png sql-ledger.gif
 +
-+SHR_FILES = sql-ledger.png sql-ledger.gif
 +
 +CFG_FILES = sql-ledger-httpd.conf sql-ledger.conf
 +
 +all:
 +
 +install: 
-+	mkdir -p $(DESTDIR)/usr/lib/sql-ledger
-+	cp  $(LIB_FILES) $(DESTDIR)/usr/lib/sql-ledger
 +	mkdir -p $(DESTDIR)/usr/share/sql-ledger
-+	cp $(SHR_FILES) $(DESTDIR)/usr/share/sql-ledger
++	cp  $(LIB_FILES) $(DESTDIR)/usr/share/sql-ledger
++	
++	
 +
-+	cd $(DESTDIR)/usr/lib/sql-ledger ; \
++	cd $(DESTDIR)/usr/share/sql-ledger ; \
 +	ln -f login.pl admin.pl ; \
 +	set -e ; for module in $(MODULES) ; do \
 +	  ln am.pl $$module ; \
@@ -224,62 +224,11 @@ exit 0
 --- sql-ledger-2.2.6.orig/sql-ledger-httpd.conf
 +++ sql-ledger-2.2.6/sql-ledger-httpd.conf
 @@ -0,0 +1,8 @@
-+Alias /sql-ledger/images/ /usr/share/sql-ledger/
 +
-+Alias /sql-ledger/ /usr/lib/sql-ledger/
 +
-+<Directory /usr/lib/sql-ledger>
++Alias /sql-ledger/ /usr/share/sql-ledger/
++
++<Directory /usr/share/sql-ledger>
 +  AddHandler cgi-script .pl
 +  Options ExecCGI Includes FollowSymlinks
 +</Directory>
---- sql-ledger-2.2.6.orig/sql-ledger.conf
-+++ sql-ledger-2.2.6/sql-ledger.conf
-@@ -0,0 +1,48 @@
-+use vars qw($userspath $spool $memberfile $templates $sendmail $language $sid $latex %printer $gzip);
-+
-+# path to user configuration files
-+$userspath = "/var/lib/sql-ledger/users";
-+
-+# spool directory for batch printing
-+$spool = "spool";
-+
-+# templates base directory
-+$templates = "templates";
-+
-+# member file
-+$memberfile = "/var/lib/sql-ledger/users/members";
-+
-+# location of sendmail
-+$sendmail = "| /usr/sbin/sendmail -t";
-+
-+# set language for login and admin
-+$language = "";
-+
-+# Oracle
-+#$sid = "T80509";
-+#$ENV{"ORACLE_HOME"} = "/usr/local/oracle";
-+
-+# if you have latex installed set to 1
-+$latex = 1;
-+
-+# available printers
-+%printer = ( Laserjet	=> 'lpr -Plaserjet',
-+             Laser	=> 'lpr -Plaser'
-+            );
-+
-+# program to use for file compression
-+$gzip = "gzip -S .gz";
-+
-+# if the server can't find gzip, latex, dvips or pdflatex, add the path
-+$ENV{PATH} .= ":/usr/local/bin";
-+
-+# on mac os X using Fink's Perl libs, add the path
-+#$ENV{PERL5LIB} .= ":/sw/lib/perl5";
-+
-+# DB2, Default dataset is expected to be LEDGER
-+#$ENV{DB2INSTANCE} = "db2inst1";
-+#$ENV{DB2_HOME} = "/opt/IBM/db2/V8.1/";
-+
-+
-+1;
-+

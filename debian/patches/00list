@@ -2,5 +2,4 @@
 # List of patches to apply.
 #
 10makefiles
-40imagepath
 45crosslink

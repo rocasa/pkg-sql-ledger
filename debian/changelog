@@ -1,3 +1,26 @@
+sql-ledger (2.6.7-1) unstable; urgency=low
+
+  [ Raphael Hertzog ]
+  * New upstream release.
+  * Generate sql-ledger.conf based on sql-ledger.conf.default from upstream.
+    Closes: #296293
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 12 Mar 2006 16:49:55 +0000
+
+sql-ledger (2.6.6-2) UNRELEASED; urgency=low
+
+  [ Raphael Hertzog ]
+  * Move all files below /usr/share/sql-ledger instead of /usr/lib/sql-ledger.
+    This is for better FHS conformance. Thus drop the imagepath patch.
+    Modified debian/patches/10makefiles.patch accordingly. Added a NEWS.Debian
+    to inform the admin of the change and put a compatibility symlink in the
+    mean time. Indirectly closes: #354781
+
+  [ Finn-Arne Johansen ]
+  * We now have enough manpower it seem (Closes: #320442)
+
+ -- Finn-Arne Johansen <faj@bzz.no>  Fri, 10 Feb 2006 20:24:58 +0100
+
 sql-ledger (2.6.6-1) unstable; urgency=low
 
   [ Raphael Hertzog ]
