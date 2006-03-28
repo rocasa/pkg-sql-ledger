@@ -3,8 +3,8 @@ Section: web
 Priority: optional
 Maintainer: Finn-Arne Johansen <faj@bzz.no>
 Uploaders: Petter Reinholdtsen <pere@debian.org>, Raphael Hertzog <hertzog@debian.org>, Gerardo Reynoso <greynoso@tindes.com>
-Build-Depends-Indep: debhelper (>= 4), dpatch
-Standards-Version: 3.6.2
+Build-Depends: debhelper (>= 4), dpatch
+Standards-Version: 3.7.2
 
 Package: sql-ledger
 Architecture: all

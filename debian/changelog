@@ -1,3 +1,12 @@
+sql-ledger (2.6.10-1) unstable; urgency=low
+
+  * New upstream release.
+  * Updated Standards-Version to 3.7.2 (no change required).
+  * Use Build-Depends instead of Build-Depends-Indep since debhelper/patch are
+    needed for the "clean" rule too. (Fix lintian warning)
+
+ -- Raphael Hertzog <hertzog@debian.org>  Tue, 28 Mar 2006 06:29:46 +0000
+
 sql-ledger (2.6.8-1) unstable; urgency=low
 
   * New upstream release.

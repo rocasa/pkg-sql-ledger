@@ -699,18 +699,18 @@ sub retrieve {
       $tth->finish;
       chop $ref->{taxaccounts};
 
-      # preserve prices
+      # preserve price
       $sellprice = $ref->{sellprice};
-      $listprice = $ref->{listprice};
       
       # multiply by exchangerate
-      for (qw(sellprice listprice)) { $ref->{$_} = $form->round_amount($ref->{$_} * $form->{$form->{currency}}, $decimalplaces) }
+      $ref->{sellprice} = $form->round_amount($ref->{sellprice} * $form->{$form->{currency}}, $decimalplaces);
+      
+      for (qw(listprice lastcost)) { $ref->{$_} = $form->round_amount($ref->{$_} / $form->{$form->{currency}}, $decimalplaces) }
       
       # partnumber and price matrix
       &price_matrix($pmh, $ref, $form->{transdate}, $decimalplaces, $form, $myconfig);
 
       $ref->{sellprice} = $sellprice;
-      $ref->{listprice} = $listprice;
 
       $ref->{partsgroup} = $ref->{partsgrouptranslation} if $ref->{partsgrouptranslation};
       
@@ -1021,6 +1021,9 @@ sub order_details {
 
   }
 
+  delete $form->{reqdate};
+  delete $form->{projectnumber};
+  
   # sort the whole thing by project and group
   @sortlist = sort { $a->[1] cmp $b->[1] } @sortlist;
   
@@ -1636,16 +1639,18 @@ sub adj_inventory {
 
     $ith->execute($ref->{id}, $ref->{id}) || $form->dberror($query);
 
+    my $ship = $ref->{ship};
     while (my $inv = $ith->fetchrow_hashref(NAME_lc)) {
 
-      if (($qty = (($inv->{total} * $ml) - $ref->{ship})) >= 0) {
-	$qty = $inv->{qty} if ($qty > ($inv->{qty} * $ml));
+      if (($qty = (($inv->{total} * $ml) - $ship)) >= 0) {
+	$qty = $inv->{qty} * $ml if ($qty > ($inv->{qty} * $ml));
 	
 	$form->update_balance($dbh,
                               "inventory",
                               "qty",
                               qq|$oid{$myconfig->{dbdriver}} = $inv->{oid}|,
                               $qty * -1 * $ml);
+	$ship -= $qty;
       }
     }
     $ith->finish;
