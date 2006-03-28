@@ -1,3 +1,19 @@
+sql-ledger (2.6.8-1) unstable; urgency=low
+
+  * New upstream release.
+    - fixed invoice batch printing
+    - included department for beginning balance calculation
+    - modified pagebreak code to count only characters for the description and
+      itemnotes
+    - updated Estonian translation and templates
+    - added Swiss German translation
+    - added price matrix for time cards
+    - added last cost and list price to labor items
+    - revised parts requirements report to split assemblies into their
+      components
+
+ -- Raphael Hertzog <hertzog@debian.org>  Tue, 28 Mar 2006 06:07:37 +0000
+
 sql-ledger (2.6.7-1) unstable; urgency=low
 
   [ Raphael Hertzog ]
