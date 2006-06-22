@@ -1,3 +1,13 @@
+sql-ledger (2.6.13-1) unstable; urgency=low
+
+  * New upstream version:
+    - added missing lastcost and assembly variable on assembly screen
+    - revised pricelist to add multiple items
+    - fixed UCOA contra switch
+    - added tax rate changes based on transaction date
+
+ -- Raphael Hertzog <hertzog@debian.org>  Thu, 22 Jun 2006 17:00:46 +0200
+
 sql-ledger (2.6.12-1) unstable; urgency=low
 
   * New upstream release.

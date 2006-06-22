@@ -444,7 +444,7 @@ sub item_selected {
 
   $i = $form->{rowcount} - 1;
   $i = $form->{assembly_rows} - 1 if ($form->{item} eq 'assembly');
-  $qty = $form->{"qty_$form->{rowcount}"};
+  $qty = ($form->{"qty_$form->{rowcount}"}) ? $form->{"qty_$form->{rowcount}"} : 1;
 
   for $j (1 .. $form->{lastndx}) {
     
@@ -702,7 +702,7 @@ sub check_form {
     
     for (qw(rop stock markup)) { $form->{$_} = $form->parse_amount(\%myconfig, $form->{$_}) }
    
-    @flds = qw(id qty unit bom adj partnumber description sellprice listprice weight runningnumber partsgroup);
+    @flds = qw(id qty unit bom adj partnumber description sellprice listprice lastcost weight assembly runningnumber partsgroup);
     $count = 0;
     @a = ();
     

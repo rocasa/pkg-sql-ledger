@@ -597,10 +597,6 @@ sub display_row {
     }
     
     if ($i < $numrows) {
-      if ($form->{"discount_$i"} != $form->{discount} * 100) {
-	$form->{"discount_$i"} = $form->{discount} * 100;
-      }
-
       $column_data{discount} = qq|<td align=right><input name="discount_$i" size=3 value=|.$form->format_amount(\%myconfig, $form->{"discount_$i"}).qq|></td>|;
     } else {
       $column_data{discount} = qq|<td></td>|;
