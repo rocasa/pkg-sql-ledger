@@ -1,3 +1,9 @@
+sql-ledger (2.6.14-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Wed, 28 Jun 2006 08:54:23 +0200
+
 sql-ledger (2.6.13-1) unstable; urgency=low
 
   * New upstream version:
