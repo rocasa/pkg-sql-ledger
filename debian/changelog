@@ -1,3 +1,13 @@
+sql-ledger (2.6.16-1) unstable; urgency=low
+
+  * New upstream version:
+    - added source field on drill-down list
+    - changed random number generator to avoid overwriting existing partnumber
+    - added hidden sales flag to employee screen
+    - fixed menu to exclude phantom lines 
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 20 Aug 2006 11:52:42 +0200
+
 sql-ledger (2.6.15-1) unstable; urgency=low
 
   * New upstream version:
