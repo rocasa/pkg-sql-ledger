@@ -1,3 +1,14 @@
+sql-ledger (2.6.17-1) unstable; urgency=low
+
+  * New upstream release:
+    - fixed problem with temporary id assignment when adding customers,
+    vendors and employees.
+  * Make the debian/postinst a bit less dumb. Do not reactivate the
+    configuration if the admin deactivated it, instead I only create a default
+    configuration if there's no file yet.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun,  3 Sep 2006 22:37:16 +0200
+
 sql-ledger (2.6.16-1) unstable; urgency=low
 
   * New upstream version:

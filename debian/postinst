@@ -21,24 +21,20 @@ fi
 # <URL:http://www.opal.dhs.org/involved/debian/apache/>, before it
 # is enabled.
 
-if [ -d /etc/apache/conf.d ] ; then # Debian/Sarge or later
-    echo "info: Detected apache for Debian/Sarge or later"
-    httpdconf=/etc/apache/conf.d/sql-ledger.conf
-else
-    echo "info: Detected apache for Debian/Woody or earlier"
-    httpdconf=/etc/apache/httpd.conf
-fi
+# Until it gets rewritten I simplify it because the current scheme
+# always reactivate sql-ledger for the default host (even if the admin
+# commented it out)
 
-includeline="Include /etc/sql-ledger/sql-ledger-httpd.conf"
-
-if test -e $httpdconf && grep -q "^$includeline" $httpdconf ; then
-    echo "info: SQL-Ledger is already enabled in $httpdconf"
-else
-    echo "$includeline" >> $httpdconf
-    echo "info: Content of $httpdconf is updated."
-    echo "info: Please restart apache for this change to take effect."
-    echo "info: Remember that there might be no admin password set at"
-    echo "info: the moment, and the installation is open for everyone."
+if [ -d /etc/apache/conf.d ] ; then
+    if [ ! -e /etc/apache/conf.d/sql-ledger.conf ]; then
+	echo "INFO: A default /etc/apache/conf.d/sql-ledger-httpd.conf has been setup."
+	cat <<END >/etc/apache/conf.d/sql-ledger.conf
+# Uncomment the following line to deactivate sql-ledger on the default
+# apache configuration. In that case you'll have to include this line of
+# configuration for each virtual host where you want to activate it
+Include /etc/sql-ledger/sql-ledger-httpd.conf
+END
+    fi
 fi
 
 #DEBHELPER#
