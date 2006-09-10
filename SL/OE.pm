@@ -2185,7 +2185,7 @@ sub consolidate_orders {
       $ordnumber ||= $form->update_defaults($myconfig, $numberfld, $dbh);
     
       $query = qq|INSERT INTO oe (ordnumber)
-		  VALUES ($uid)|;
+		  VALUES ('$uid')|;
       $dbh->do($query) || $form->dberror($query);
 
       $query = qq|SELECT id

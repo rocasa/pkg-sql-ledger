@@ -1,3 +1,12 @@
+sql-ledger (2.6.18-1) unstable; urgency=low
+
+  * New upstream release.
+    - fix security issue with sessions cookies: CVE-2006-4244
+      Closes: #386519
+  * Updated watch file, sourceforge is not really up-to-date.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 10 Sep 2006 21:08:15 +0200
+
 sql-ledger (2.6.17-1) unstable; urgency=low
 
   * New upstream release:
