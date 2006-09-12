@@ -166,42 +166,42 @@ sub check_password {
 	  $cookie{$name} = $value;
 	}
 	
-	if ($form->{action} ne 'display') {
-	  if ($cookie{"SL-$form->{login}"}) {
-	    
-	    $form->{sessioncookie} = $cookie{"SL-$form->{login}"};
-	    
-	    $s = "";
-	    %ndx = ();
-            # take cookie apart
-	    $l = length $form->{sessioncookie};
-	    
-	    for $i (0 .. $l - 1) {
-	      $j = substr($myconfig{sessionkey}, $i * 2, 2);
-	      $ndx{$j} = substr($cookie{"SL-$form->{login}"}, $i, 1);
-	    }
-
-	    for (sort keys %ndx) {
-	      $s .= $ndx{$_};
-	    }
-
-            $l = length $form->{login};
-	    $login = substr($s, 0, $l);
-	    $time = substr($s, -10);
-	    $password = substr($s, $l, (length $s) - ($l + 10));
-
-	    # validate cookie
-	    if ((time > $time) || ($login ne $form->{login}) || ($myconfig{password} ne crypt $password, substr($form->{login}, 0, 2))) {
-	      &getpassword(1);
-	      exit;
-	    }
-
-	  } else {
-
-	    &getpassword(1); 
-	    exit; 
-
+	if ($cookie{"SL-$form->{login}"}) {
+	  
+	  $form->{sessioncookie} = $cookie{"SL-$form->{login}"};
+	  
+	  $s = "";
+	  %ndx = ();
+	  # take cookie apart
+	  $l = length $form->{sessioncookie};
+	  
+	  for $i (0 .. $l - 1) {
+	    $j = substr($myconfig{sessionkey}, $i * 2, 2);
+	    $ndx{$j} = substr($cookie{"SL-$form->{login}"}, $i, 1);
 	  }
+
+	  for (sort keys %ndx) {
+	    $s .= $ndx{$_};
+	  }
+
+	  $l = length $form->{login};
+	  $login = substr($s, 0, $l);
+	  $time = substr($s, -10);
+	  $password = substr($s, $l, (length $s) - ($l + 10));
+
+	  # validate cookie
+	  if ((time > $time) || ($login ne $form->{login}) || ($myconfig{password} ne crypt $password, substr($form->{login}, 0, 2))) {
+	    &getpassword(1);
+	    exit;
+	  }
+
+	} else {
+
+	  if ($form->{action} ne 'display') {
+	    &getpassword(1); 
+	    exit;
+	  }
+
 	}
       } else {
 	exit;
