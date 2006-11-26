@@ -1,3 +1,13 @@
+sql-ledger (2.4.7-2sarge1) stable-security; urgency=high
+
+  * Security upload.
+  * Fix bad handling of sessionid: CVE-2006-4244
+    Closes: #386519 (backported from 2.6.18)
+  * Fix directory traversal security issues (backported from 2.6.19)
+  * Fix a remote execution vulnerability too (backported from 2.6.21).
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 26 Nov 2006 11:00:57 +0000
+
 sql-ledger (2.4.7-2) unstable; urgency=low
 
   * Rewrite the new helper script sql-ledger-enable, to follow the
