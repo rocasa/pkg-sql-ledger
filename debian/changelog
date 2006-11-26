@@ -1,9 +1,15 @@
+sql-ledger (2.6.21-1) unstable; urgency=high
+
+  * New upstream release.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 26 Nov 2006 11:53:53 +0100
+
 sql-ledger (2.6.19-1) unstable; urgency=high
 
   * New upstream release.
     - fixed path traversal bug in terminal variable (potential security issue)
     - fixed New Window tab session timeout
-  * Increase urgency as the two last releaset fix security issues that should
+  * Increase urgency as the two last release fix security issues that should
     go into testing as quickly as possible.
 
  -- Raphael Hertzog <hertzog@debian.org>  Tue, 12 Sep 2006 10:52:59 +0200
