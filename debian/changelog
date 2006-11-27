@@ -1,3 +1,9 @@
+sql-ledger (2.6.21-2) unstable; urgency=high
+
+  * Further improve the security check introduced in 2.6.21.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Mon, 27 Nov 2006 08:30:51 +0100
+
 sql-ledger (2.6.21-1) unstable; urgency=high
 
   * New upstream release.
