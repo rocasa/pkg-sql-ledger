@@ -1,6 +1,28 @@
 sql-ledger for Debian
 ---------------------
 
+IMPORTANT SECURITY NOTICE
+-------------------------
+SQL-Ledger is known to have many vulnerabilities that are exploitable by
+someone who has a user account on this web application. That's why you
+should *only* use that application if you trust the users that have access
+to it.
+
+Historically it also had some vulnerabilities that could be exploited even
+without having an account. So we advise to you to put this web
+application in an authenticated HTTP zone.
+
+Summary: SQL-Ledger is not suitable for public installations or for
+installations with untrusted users.
+
+Some pointers:
+http://bugs.debian.org/409703
+http://www.securityfocus.com/archive/1/459264
+http://www.securityfocus.com/archive/1/445817
+
+CONFIGURATION INFORMATION
+-------------------------
+
 To test this package you need to add this line to you
 /etc/apache/httpd.conf:
  include /etc/sql-ledger/sql-ledger-httpd.conf
