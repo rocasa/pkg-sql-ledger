@@ -12,29 +12,4 @@ if ! test -L /usr/lib/sql-ledger; then
     echo "WARNING: Unable to replace /usr/lib/sql-ledger by a symlink"
 fi
 
-#
-# Activate SQL-Ledger in apache configuration.  Small helper script
-# to reduce the chance of typos.
-#
-# This should be rewritten to follow the info in
-# <URL:http://deb.riseup.net/mail/buffy/mail-clients/apache/> or
-# <URL:http://www.opal.dhs.org/involved/debian/apache/>, before it
-# is enabled.
-
-# Until it gets rewritten I simplify it because the current scheme
-# always reactivate sql-ledger for the default host (even if the admin
-# commented it out)
-
-if [ -d /etc/apache/conf.d ] ; then
-    if [ ! -e /etc/apache/conf.d/sql-ledger.conf ]; then
-	echo "INFO: A default /etc/apache/conf.d/sql-ledger-httpd.conf has been setup."
-	cat <<END >/etc/apache/conf.d/sql-ledger.conf
-# Uncomment the following line to deactivate sql-ledger on the default
-# apache configuration. In that case you'll have to include this line of
-# configuration for each virtual host where you want to activate it
-Include /etc/sql-ledger/sql-ledger-httpd.conf
-END
-    fi
-fi
-
 #DEBHELPER#

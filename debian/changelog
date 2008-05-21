@@ -1,3 +1,21 @@
+sql-ledger (2.8.14-1) unstable; urgency=low
+
+  * New upstream release. 
+    * Close a few security issues. Closes: #418724
+  * Add Homepage field.
+  * Replaced dependency on apache by apache2. Closes: #482158
+  * Also replace tetex-extra Suggests by texlive-latex-extra | tetex-extra.
+  * Added Vcs-Svn, Vcs-Browser control fields.
+  * Switched to debhelper v5 mode.
+  * Drop configuration in postinst add a NEWS entry about initial
+    configuration.
+  * Updated 10makefiles.dpatch to match new upstream version
+    (hopefully).
+  * Converted copyright file to UTF-8.
+  * Upgraded Standards-Version to 3.7.3 (no change).
+
+ -- Raphael Hertzog <hertzog@debian.org>  Wed, 21 May 2008 23:07:35 +0200
+
 sql-ledger (2.6.22-2) unstable; urgency=high
 
   * Document the security problem of SQL-Ledger in the README.Debian file

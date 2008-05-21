@@ -1,24 +1,10 @@
 #=====================================================================
-# SQL-Ledger Accounting
-# Copyright (C) 2003
+# SQL-Ledger ERP
+# Copyright (C) 2006
 #
 #  Author: DWS Systems Inc.
-#     Web: http://www.sql-ledger.org
+#     Web: http://www.sql-ledger.com
 #
-#  Contributors:
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #======================================================================
 #
 # backend code for human resources and payroll
@@ -46,17 +32,20 @@ sub get_employee {
     $sth->execute || $form->dberror($query);
   
     $ref = $sth->fetchrow_hashref(NAME_lc);
-  
-    # check if employee can be deleted, orphaned
-    $form->{status} = "orphaned" unless $ref->{login};
-
-$form->{status} = 'orphaned';   # leave orphaned for now until payroll is done
-
     $ref->{employeelogin} = $ref->{login};
     delete $ref->{login};
     for (keys %$ref) { $form->{$_} = $ref->{$_} }
 
     $sth->finish;
+  
+    # check if employee can be deleted, orphaned
+    if (!$form->{employeelogin}) {
+      
+      $query = qq|SELECT count(*) FROM jcitems
+                  WHERE employee_id = $form->{id}|;
+      ($form->{status}) = $dbh->selectrow_array($query);
+      $form->{status} = ($form->{status}) ? "" : "orphaned";
+    }
 
     # get manager
     $form->{managerid} *= 1;
@@ -87,8 +76,7 @@ if ($form->{deductions}) {
     
   } else {
 
-    $query = qq|SELECT current_date FROM defaults|;
-    ($form->{startdate}) = $dbh->selectrow_array($query);
+    $form->{startdate} = $form->current_date($myconfig);
   
   }
   
@@ -138,7 +126,7 @@ sub save_employee {
 
   if (! $form->{id}) {
     my $uid = localtime;
-    $uid .= "$$";
+    $uid .= $$;
 
     $query = qq|INSERT INTO employee (name)
                 VALUES ('$uid')|;
@@ -169,6 +157,8 @@ sub save_employee {
 	      zipcode = |.$dbh->quote($form->{zipcode}).qq|,
 	      country = |.$dbh->quote($form->{country}).qq|,
 	      workphone = '$form->{workphone}',
+	      workfax = '$form->{workfax}',
+	      workmobile = '$form->{workmobile}',
 	      homephone = '$form->{homephone}',
 	      startdate = |.$form->dbquote($form->{startdate}, SQL_DATE).qq|,
 	      enddate = |.$form->dbquote($form->{enddate}, SQL_DATE).qq|,
@@ -234,8 +224,11 @@ sub employees {
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
 
+  my %defaults = $form->get_defaults($dbh, \@{['company']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
+
   my $where = "1 = 1";
-  $form->{sort} = ($form->{sort}) ? $form->{sort} : "name";
+  $form->{sort} ||= "name";
   my @a = qw(name);
   my $sortorder = $form->sort_order(\@a);
   
@@ -247,18 +240,21 @@ sub employees {
       $where .= " AND lower(e.$_) LIKE '$var'";
     }
   }
-  
+ 
   if ($form->{startdatefrom}) {
     $where .= " AND e.startdate >= '$form->{startdatefrom}'";
   }
   if ($form->{startdateto}) {
-    $where .= " AND e.startddate <= '$form->{startdateto}'";
+    $where .= " AND e.startdate <= '$form->{startdateto}'";
   }
   if ($form->{sales} eq 'Y') {
     $where .= " AND e.sales = '1'";
   }
   if ($form->{status} eq 'orphaned') {
-    $where .= qq| AND e.login IS NULL|;
+    $where .= qq| AND e.login IS NULL
+                  AND NOT e.id IN 
+		          (SELECT DISTINCT employee_id
+			   FROM jcitems)|;
   }
   if ($form->{status} eq 'active') {
     $where .= qq| AND e.enddate IS NULL|;
@@ -297,21 +293,30 @@ sub get_deduction {
   my $ref;
   my $item;
   my $i;
-  
+
+  my %defaults = $form->get_defaults($dbh, \@{['precision', 'company']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
+
   if ($form->{id}) {
     $query = qq|SELECT d.*,
                  c1.accno AS ap_accno,
                  c1.description AS ap_description,
+		 l1.description AS ap_translation,
 		 c2.accno AS expense_accno,
-		 c2.description AS expense_description
+		 c2.description AS expense_description,
+		 l2.description AS expense_translation
                  FROM deduction d
 		 LEFT JOIN chart c1 ON (c1.id = d.ap_accno_id)
 		 LEFT JOIN chart c2 ON (c2.id = d.expense_accno_id)
+		 LEFT JOIN translation l1 ON (l1.trans_id = c1.id AND l1.language_code = '$myconfig->{countrycode}')
+		 LEFT JOIN translation l2 ON (l2.trans_id = c2.id AND l2.language_code = '$myconfig->{countrycode}')
                  WHERE d.id = $form->{id}|;
     $sth = $dbh->prepare($query);
     $sth->execute || $form->dberror($query);
   
     $ref = $sth->fetchrow_hashref(NAME_lc);
+    $ref->{ap_description} = $ref->{ap_translation} if $ref->{ap_translation};
+    $ref->{expense_description} = $ref->{expense_translation} if $ref->{expense_translation};
     for (keys %$ref) { $form->{$_} = $ref->{$_} }
 
     $sth->finish;
@@ -385,15 +390,18 @@ $form->{status} = 'orphaned';     # for now
                    expense	=> 'E' );
   
   foreach $item (keys %category) {
-    $query = qq|SELECT accno, description
-		FROM chart
-		WHERE charttype = 'A'
-		AND category = '$category{$item}'
-		ORDER BY accno|;
+    $query = qq|SELECT c.accno, c.description,
+                l.description AS translation
+		FROM chart c
+		LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+		WHERE c.charttype = 'A'
+		AND c.category = '$category{$item}'
+		ORDER BY c.accno|;
     $sth = $dbh->prepare($query);
     $sth->execute || $form->dberror($query);
 
     while ($ref = $sth->fetchrow_hashref(NAME_lc)) {
+      $ref->{description} = $ref->{translation} if $ref->{translation};
       push @{ $form->{"${item}_accounts"} }, $ref;
     }
     $sth->finish;
@@ -409,7 +417,10 @@ sub deductions {
   my ($self, $myconfig, $form) = @_;
 
   my $dbh = $form->dbconnect($myconfig);
-  
+
+  my %defaults = $form->get_defaults($dbh, \@{['precision', 'company']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
+
   my $query = qq|SELECT d.id, d.description, d.employeepays, d.employerpays,
                  c1.accno AS ap_accno, c2.accno AS expense_accno,
                  dr.rate, dr.amount, dr.above, dr.below
@@ -447,7 +458,7 @@ sub save_deduction {
 
   if (! $form->{id}) {
     my $uid = localtime;
-    $uid .= "$$";
+    $uid .= $$;
 
     $query = qq|INSERT INTO deduction (description)
                 VALUES ('$uid')|;

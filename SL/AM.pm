@@ -1,24 +1,10 @@
 #=====================================================================
-# SQL-Ledger Accounting
-# Copyright (C) 2000
+# SQL-Ledger ERP
+# Copyright (c) 2006
 #
 #  Author: DWS Systems Inc.
-#     Web: http://www.sql-ledger.org
+#     Web: http://www.sql-ledger.com
 #
-#  Contributors: Jim Rawlings <jim@your-dba.com>
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #======================================================================
 #
 # Administration module
@@ -49,15 +35,8 @@ sub get_account {
   $sth->finish;
 
   # get default accounts
-  $query = qq|SELECT inventory_accno_id, income_accno_id, expense_accno_id,
-              fxgain_accno_id, fxloss_accno_id
-              FROM defaults|;
-  $sth = $dbh->prepare($query);
-  $sth->execute || $form->dberror($query);
-
-  $ref = $sth->fetchrow_hashref(NAME_lc);
-  for (keys %$ref) { $form->{$_} = $ref->{$_} }
-  $sth->finish;
+  my %defaults = $form->get_defaults($dbh, \@{['%accno_id']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
 
   # check if we have any transactions
   $query = qq|SELECT trans_id FROM acc_trans
@@ -81,10 +60,12 @@ sub save_account {
 		    $form->{AR_amount},
                     $form->{AR_tax},
                     $form->{AR_paid},
+		    $form->{AR_discount},
                     $form->{AP},
 		    $form->{AP_amount},
 		    $form->{AP_tax},
 		    $form->{AP_paid},
+		    $form->{AP_discount},
 		    $form->{IC},
 		    $form->{IC_income},
 		    $form->{IC_sale},
@@ -103,6 +84,8 @@ sub save_account {
   foreach my $item (qw(accno gifi_accno description)) {
     $form->{$item} =~ s/-(-+)/-/g;
     $form->{$item} =~ s/ ( )+/ /g;
+    $form->{$item} =~ s/^\s+//;
+    $form->{$item} =~ s/\s+$//;
   }
   
   my $query;
@@ -127,7 +110,8 @@ sub save_account {
 		contra)
                 VALUES ('$form->{accno}',|
 		.$dbh->quote($form->{description}).qq|,
-		'$form->{charttype}', '$form->{gifi_accno}',
+		'$form->{charttype}', |
+		.$dbh->quote($form->{gifi_accno}).qq|,
 		'$form->{category}', '$form->{link}', '$form->{contra}')|;
   }
   $dbh->do($query) || $form->dberror($query);
@@ -194,23 +178,34 @@ sub delete_account {
   $query = qq|DELETE FROM chart
               WHERE id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
+  
+  $query = qq|DELETE FROM bank
+              WHERE id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
+  
+  $query = qq|DELETE FROM address
+              WHERE trans_id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
+  
+  $query = qq|DELETE FROM translation
+              WHERE trans_id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
 
   # set inventory_accno_id, income_accno_id, expense_accno_id to defaults
+  my %defaults = $form->get_defaults($dbh, \@{['%_accno_id']});
+  
   $query = qq|UPDATE parts
-              SET inventory_accno_id = 
-	                 (SELECT inventory_accno_id FROM defaults)
+              SET inventory_accno_id = $defaults{inventory_accno_id}
 	      WHERE inventory_accno_id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
   
   $query = qq|UPDATE parts
-              SET income_accno_id =
-	                 (SELECT income_accno_id FROM defaults)
+              SET income_accno_id = $defaults{income_accno_id}
 	      WHERE income_accno_id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
   
   $query = qq|UPDATE parts
-              SET expense_accno_id =
-	                 (SELECT expense_accno_id FROM defaults)
+              SET expense_accno_id = $defaults{expense_accno_id}
 	      WHERE expense_accno_id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
   
@@ -300,7 +295,8 @@ sub save_gifi {
   } else {
     $query = qq|INSERT INTO gifi 
                 (accno, description)
-                VALUES ('$form->{accno}',|
+                VALUES (|
+		.$dbh->quote($form->{accno}).qq|,|
 		.$dbh->quote($form->{description}).qq|)|;
   }
   $dbh->do($query) || $form->dberror; 
@@ -333,8 +329,10 @@ sub warehouses {
   my $dbh = $form->dbconnect($myconfig);
 
   $form->sort_order();
-  my $query = qq|SELECT id, description
-                 FROM warehouse
+  my $query = qq|SELECT w.id, w.description,
+                 a.address1, a.address2, a.city, a.state, a.zipcode, a.country
+                 FROM warehouse w
+		 JOIN address a ON (a.trans_id = w.id)
 		 ORDER BY 2 $form->{direction}|;
 
   $sth = $dbh->prepare($query);
@@ -357,10 +355,17 @@ sub get_warehouse {
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
   
-  my $query = qq|SELECT description
-                 FROM warehouse
-	         WHERE id = $form->{id}|;
-  ($form->{description}) = $dbh->selectrow_array($query);
+  my $query = qq|SELECT w.description, a.address1, a.address2, a.city,
+                 a.state, a.zipcode, a.country
+                 FROM warehouse w
+		 JOIN address a ON (a.trans_id = w.id)
+	         WHERE w.id = $form->{id}|;
+  my $sth = $dbh->prepare($query) || $form->dberror($query);
+  $sth->execute;
+  
+  my $ref = $sth->fetchrow_hashref(NAME_lc);
+  for (keys %$ref) { $form->{$_} = $ref->{$_} }
+  $sth->finish;
 
   # see if it is in use
   $query = qq|SELECT * FROM inventory
@@ -377,23 +382,56 @@ sub save_warehouse {
   my ($self, $myconfig, $form) = @_;
   
   # connect to database
-  my $dbh = $form->dbconnect($myconfig);
+  my $dbh = $form->dbconnect_noauto($myconfig);
   
   $form->{description} =~ s/-(-)+/-/g;
   $form->{description} =~ s/ ( )+/ /g;
 
   if ($form->{id}) {
-    $query = qq|UPDATE warehouse SET
-		description = |.$dbh->quote($form->{description}).qq|
+    $query = qq|SELECT id
+                FROM warehouse
 		WHERE id = $form->{id}|;
-  } else {
-    $query = qq|INSERT INTO warehouse
-                (description)
-                VALUES (|.$dbh->quote($form->{description}).qq|)|;
+    ($form->{id}) = $dbh->selectrow_array($query);
   }
+
+  if (!$form->{id}) {
+    $uid = localtime;
+    $uid .= $$;
+    
+    $query = qq|INSERT INTO warehouse (description)
+                VALUES ('$uid')|;
+    $dbh->do($query) || $form->dberror($query);
+    
+    $query = qq|SELECT id
+                FROM warehouse
+		WHERE description = '$uid'|;
+    ($form->{id}) = $dbh->selectrow_array($query);
+
+    $query = qq|INSERT INTO address (trans_id)
+                VALUES ($form->{id})|;
+    $dbh->do($query) || $form->dberror($query);
+    
+  }
+   
+  $query = qq|UPDATE warehouse SET
+	      description = |.$dbh->quote($form->{description}).qq|
+	      WHERE id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
-  
+
+  $query = qq|UPDATE address SET
+              address1 = |.$dbh->quote($form->{address1}).qq|,
+              address2 = |.$dbh->quote($form->{address2}).qq|,
+              city = |.$dbh->quote($form->{city}).qq|,
+              state = |.$dbh->quote($form->{state}).qq|,
+              zipcode = |.$dbh->quote($form->{zipcode}).qq|,
+              country = |.$dbh->quote($form->{country}).qq|
+	      WHERE trans_id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
+
+  my $rc = $dbh->commit;
   $dbh->disconnect;
+
+  $rc;
 
 }
 
@@ -402,13 +440,20 @@ sub delete_warehouse {
   my ($self, $myconfig, $form) = @_;
   
   # connect to database
-  my $dbh = $form->dbconnect($myconfig);
+  my $dbh = $form->dbconnect_noauto($myconfig);
   
-  $query = qq|DELETE FROM warehouse
+  my $query = qq|DELETE FROM warehouse
 	      WHERE id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
   
+  $query = qq|DELETE FROM address
+	      WHERE trans_id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
+  
+  my $rc = $dbh->commit;
   $dbh->disconnect;
+
+  $rc;
 
 }
 
@@ -450,8 +495,6 @@ sub get_department {
 	         WHERE id = $form->{id}|;
   ($form->{description}, $form->{role}) = $dbh->selectrow_array($query);
   
-  for (keys %$ref) { $form->{$_} = $ref->{$_} }
-
   # see if it is in use
   $query = qq|SELECT * FROM dpt_trans
               WHERE department_id = $form->{id}|;
@@ -583,6 +626,113 @@ sub delete_business {
   $query = qq|DELETE FROM business
 	      WHERE id = $form->{id}|;
   $dbh->do($query) || $form->dberror($query);
+  
+  $dbh->disconnect;
+
+}
+
+
+sub paymentmethod {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+
+  my %defaults = $form->get_defaults($dbh, \@{['precision']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
+  
+  $form->{sort} ||= "rn";
+ 
+  my @a = qw(description rn);
+  my %ordinal = ( description	=> 2,
+                  rn		=> 4 );
+  my $sortorder = $form->sort_order(\@a, \%ordinal);
+  
+  my $query = qq|SELECT *
+                 FROM paymentmethod
+		 ORDER BY $sortorder $form->{direction}|;
+
+  $sth = $dbh->prepare($query);
+  $sth->execute || $form->dberror($query);
+
+  while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    push @{ $form->{ALL} }, $ref;
+  }
+  $sth->finish;
+
+  $dbh->disconnect;
+  
+}
+
+
+
+sub get_paymentmethod {
+  my ($self, $myconfig, $form) = @_;
+
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+  
+  my $query = qq|SELECT description, fee
+                 FROM paymentmethod
+	         WHERE id = $form->{id}|;
+  ($form->{description}, $form->{fee}) = $dbh->selectrow_array($query);
+
+  $dbh->disconnect;
+
+}
+
+
+sub save_paymentmethod {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+  
+  $form->{description} =~ s/-(-)+/-/g;
+  $form->{description} =~ s/ ( )+/ /g;
+  
+  if ($form->{id}) {
+    $query = qq|UPDATE paymentmethod SET
+		description = |.$dbh->quote($form->{description}).qq|,
+		fee = |.$form->parse_amount($myconfig, $form->{fee}).qq|
+		WHERE id = $form->{id}|;
+  } else {
+    $query = qq|SELECT MAX(rn) FROM paymentmethod|;
+    my ($rn) = $dbh->selectrow_array($query);
+    $rn++;
+    
+    $query = qq|INSERT INTO paymentmethod 
+                (rn, description, fee)
+		VALUES ($rn, |
+		.$dbh->quote($form->{description}).qq|, |.
+		$form->parse_amount($myconfig, $form->{fee}).qq|)|;
+  }
+  $dbh->do($query) || $form->dberror($query);
+  
+  $dbh->disconnect;
+
+}
+
+
+sub delete_paymentmethod {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+  
+  my $query = qq|SELECT rn FROM paymentmethod
+                 WHERE id = $form->{id}|;
+  my ($rn) = $dbh->selectrow_array($query);
+  
+  $query = qq|UPDATE paymentmethod SET rn = rn - 1
+              WHERE rn > $rn|;
+  $dbh->do($query) || $form->dberror($query);
+ 
+  $query = qq|DELETE FROM paymentmethod
+	      WHERE id = $form->{id}|;
+  $dbh->do($query) || $form->dberror($query);
+  
+  $dbh->commit;
   
   $dbh->disconnect;
 
@@ -788,17 +938,28 @@ sub recurring_transactions {
 
   my $dbh = $form->dbconnect($myconfig);
 
-  my $query = qq|SELECT curr FROM defaults|;
-  my ($defaultcurrency) = $dbh->selectrow_array($query);
-  $defaultcurrency =~ s/:.*//g;
+  my %defaults = $form->get_defaults($dbh, \@{['precision', 'company']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
 
+  my %ordinal = ( reference => 10,
+                  description => 4,
+		  name => 5,
+		  vcnumber => 6,
+		  nextdate => 12,
+		  enddate => 13 );
+  
   $form->{sort} ||= "nextdate";
   my @a = ($form->{sort});
-  my $sortorder = $form->sort_order(\@a);
-  
+  my $sortorder = $form->sort_order(\@a, \%ordinal);
+
+  # get default currency
+  $query = qq|SELECT curr FROM curr
+              ORDER BY rn|;
+  my ($defaultcurrency) = $dbh->selectrow_array($query);
+ 
   $query = qq|SELECT 'ar' AS module, 'ar' AS transaction, a.invoice,
-                 n.name AS description, a.amount,
-                 s.*, se.formname AS recurringemail,
+                 a.description, n.name, n.customernumber AS vcnumber,
+		 n.id AS name_id, a.amount, s.*, se.formname AS recurringemail,
                  sp.formname AS recurringprint,
 		 s.nextdate - current_date AS overdue, 'customer' AS vc,
 		 ex.buy AS exchangerate, a.curr,
@@ -814,8 +975,8 @@ sub recurring_transactions {
 	 UNION
 
                  SELECT 'ap' AS module, 'ap' AS transaction, a.invoice,
-		 n.name AS description, a.amount,
-                 s.*, se.formname AS recurringemail,
+		 a.description, n.name, n.vendornumber AS vcnumber,
+		 n.id AS name_id, a.amount, s.*, se.formname AS recurringemail,
                  sp.formname AS recurringprint,
 		 s.nextdate - current_date AS overdue, 'vendor' AS vc,
 		 ex.sell AS exchangerate, a.curr,
@@ -831,7 +992,7 @@ sub recurring_transactions {
 	 UNION
 
                  SELECT 'gl' AS module, 'gl' AS transaction, FALSE AS invoice,
-		 a.description,
+		 a.description, '' AS name, '' AS vcnumber, 0 AS name_id,
 		 (SELECT SUM(ac.amount) FROM acc_trans ac WHERE ac.trans_id = a.id AND ac.amount > 0) AS amount,
                  s.*, se.formname AS recurringemail,
                  sp.formname AS recurringprint,
@@ -846,8 +1007,8 @@ sub recurring_transactions {
 	UNION
 
                  SELECT 'oe' AS module, 'so' AS transaction, FALSE AS invoice,
-		 n.name AS description, a.amount,
-                 s.*, se.formname AS recurringemail,
+		 a.description, n.name, n.customernumber AS vcnumber,
+		 n.id AS name_id, a.amount, s.*, se.formname AS recurringemail,
                  sp.formname AS recurringprint,
 		 s.nextdate - current_date AS overdue, 'customer' AS vc,
 		 ex.buy AS exchangerate, a.curr,
@@ -864,8 +1025,8 @@ sub recurring_transactions {
 	UNION
 
                  SELECT 'oe' AS module, 'po' AS transaction, FALSE AS invoice,
-		 n.name AS description, a.amount,
-                 s.*, se.formname AS recurringemail,
+		 a.description, n.name, n.vendornumber AS vcnumber,
+		 n.id AS name_id, a.amount, s.*, se.formname AS recurringemail,
                  sp.formname AS recurringprint,
 		 s.nextdate - current_date AS overdue, 'vendor' AS vc,
 		 ex.sell AS exchangerate, a.curr,
@@ -941,6 +1102,7 @@ sub recurring_transactions {
   
 }
 
+
 sub recurring_details {
   my ($self, $myconfig, $form, $id) = @_;
 
@@ -1012,10 +1174,11 @@ sub update_recurring {
 		 WHERE id = $id|;
   my ($nextdate, $repeat, $unit) = $dbh->selectrow_array($query);
   
-  my %advance = ( 'Pg' => "(date '$nextdate' + interval '$repeat $unit')",
-                  'DB2' => qq|(date ('$nextdate') + "$repeat $unit")|,
+  my %advance = ( 'Pg' => qq|(date '$nextdate' + interval '$repeat $unit')|,
+              'Sybase' => qq|dateadd($myconfig->{dateformat}, $repeat $unit, $nextdate)|,
+                 'DB2' => qq|(date ('$nextdate') + "$repeat $unit")|,
 		 );
-  $interval{Oracle} = $interval{PgPP} = $interval{Pg};
+  for (qw(PgPP Oracle)) { $interval{$_} = $interval{Pg} }
 
   # check if it is the last date
   $query = qq|SELECT $advance{$myconfig->{dbdriver}} > enddate
@@ -1074,15 +1237,12 @@ sub save_preferences {
   # update name
   my $query = qq|UPDATE employee
                  SET name = |.$dbh->quote($form->{name}).qq|,
-	         role = '$form->{role}'
+	         role = '$form->{role}',
+		 workphone = '$form->{tel}'
 	         WHERE login = '$form->{login}'|;
   $dbh->do($query) || $form->dberror($query);
-  
-  # get default currency
-  $query = qq|SELECT curr, businessnumber
-              FROM defaults|;
-  ($form->{currency}, $form->{businessnumber}) = $dbh->selectrow_array($query);
-  $form->{currency} =~ s/:.*//;
+
+  my %defaults = $form->get_defaults($dbh, \@{['company']});
   
   $dbh->disconnect;
 
@@ -1091,7 +1251,8 @@ sub save_preferences {
   foreach my $item (keys %$form) {
     $myconfig->{$item} = $form->{$item};
   }
-
+  
+  $myconfig->{company} = $defaults{company};
   $myconfig->{password} = $form->{new_password} if ($form->{old_password} ne $form->{new_password});
 
   $myconfig->save_member($memberfile, $userspath);
@@ -1106,50 +1267,49 @@ sub save_defaults {
   my ($self, $myconfig, $form) = @_;
 
   for (qw(IC IC_income IC_expense FX_gain FX_loss)) { ($form->{$_}) = split /--/, $form->{$_} }
+  $form->{inventory_accno} = $form->{IC};
+  $form->{income_accno} = $form->{IC_income};
+  $form->{expense_accno} = $form->{IC_expense};
+  $form->{fxgain_accno} = $form->{FX_gain};
+  $form->{fxloss_accno} = $form->{FX_loss};
   
-  my @a;
-  $form->{curr} =~ s/ //g;
-  for (split /:/, $form->{curr}) { push(@a, uc pack "A3", $_) if $_ }
-  $form->{curr} = join ':', @a;
-    
   # connect to database
   my $dbh = $form->dbconnect_noauto($myconfig);
-  
-  # save defaults
-  my $query = qq|UPDATE defaults SET
-                 inventory_accno_id = 
-		     (SELECT id FROM chart
-		                WHERE accno = '$form->{IC}'),
-                 income_accno_id =
-		     (SELECT id FROM chart
-		                WHERE accno = '$form->{IC_income}'),
-	         expense_accno_id =
-		     (SELECT id FROM chart
-		                WHERE accno = '$form->{IC_expense}'),
-	         fxgain_accno_id =
-		     (SELECT id FROM chart
-		                WHERE accno = '$form->{FX_gain}'),
-	         fxloss_accno_id =
-		     (SELECT id FROM chart
-		                WHERE accno = '$form->{FX_loss}'),
-	         glnumber = '$form->{glnumber}',
-	         sinumber = '$form->{sinumber}',
-		 vinumber = '$form->{vinumber}',
-	         sonumber = '$form->{sonumber}',
-	         ponumber = '$form->{ponumber}',
-		 sqnumber = '$form->{sqnumber}',
-		 rfqnumber = '$form->{rfqnumber}',
-		 partnumber = '$form->{partnumber}',
-		 employeenumber = '$form->{employeenumber}',
-		 customernumber = '$form->{customernumber}',
-		 vendornumber = '$form->{vendornumber}',
-		 projectnumber = '$form->{projectnumber}',
-		 yearend = '$form->{yearend}',
-		 curr = '$form->{curr}',
-		 weightunit = |.$dbh->quote($form->{weightunit}).qq|,
-		 businessnumber = |.$dbh->quote($form->{businessnumber});
-  $dbh->do($query) || $form->dberror($query);
 
+  my $query;
+  
+  $query = qq|DELETE FROM defaults|;
+  $dbh->do($query) || $form->dberror($query);
+  
+  $query = qq|INSERT INTO defaults (fldname, fldvalue)
+              VALUES (?, ?)|;
+  $sth = $dbh->prepare($query) || $form->dberror($query);
+
+  # must be present
+  $sth->execute('version', $form->{dbversion}) || $form->dberror;
+  $sth->finish;
+  
+  for (qw(inventory income expense fxgain fxloss)) {
+    $query = qq|INSERT INTO defaults (fldname, fldvalue)
+                VALUES ('${_}_accno_id', (SELECT id
+		                FROM chart
+				WHERE accno = '$form->{"${_}_accno"}'))|;
+    $dbh->do($query) || $form->dberror($query);
+  }
+ 
+  for (qw(glnumber sinumber vinumber batchnumber vouchernumber sonumber ponumber sqnumber rfqnumber partnumber employeenumber customernumber vendornumber projectnumber precision)) {
+    $sth->execute($_, $form->{$_}) || $form->dberror;
+    $sth->finish;
+  }
+
+  # optional
+  for (qw(company address tel fax yearend weightunit businessnumber closedto revtrans audittrail method cdt namesbynumber)) {
+    if ($form->{$_}) {
+      $sth->execute($_, $form->{$_}) || $form->dberror;
+      $sth->finish;
+    }
+  }
+  
   my $rc = $dbh->commit;
   $dbh->disconnect;
 
@@ -1164,13 +1324,13 @@ sub defaultaccounts {
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
   
-  # get defaults from defaults table
-  my $query = qq|SELECT * FROM defaults|;
-  my $sth = $dbh->prepare($query);
-  $sth->execute || $form->dberror($query);
+  my $query;
+  my $sth;
   
-  my $ref = $sth->fetchrow_hashref(NAME_lc);
-  for (keys %$ref) { $form->{$_} = $ref->{$_} }
+  # get defaults from defaults table
+  my %defaults = $form->get_defaults($dbh);
+
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
   
   $form->{defaults}{IC} = $form->{inventory_accno_id};
   $form->{defaults}{IC_income} = $form->{income_accno_id};
@@ -1180,12 +1340,12 @@ sub defaultaccounts {
   $form->{defaults}{FX_gain} = $form->{fxgain_accno_id};
   $form->{defaults}{FX_loss} = $form->{fxloss_accno_id};
   
-  $sth->finish;
-
-  $query = qq|SELECT id, accno, description, link
-              FROM chart
-              WHERE link LIKE '%IC%'
-              ORDER BY accno|;
+  $query = qq|SELECT c.id, c.accno, c.description, c.link,
+              l.description AS translation
+              FROM chart c
+	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+              WHERE c.link LIKE '%IC%'
+              ORDER BY c.accno|;
   $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
 
@@ -1200,6 +1360,8 @@ sub defaultaccounts {
 	if ($key =~ /sale/) {
 	  $nkey = "IC_income";
 	}
+	$ref->{description} = $ref->{translation} if $ref->{translation};
+
         %{ $form->{accno}{$nkey}{$ref->{accno}} } = ( id => $ref->{id},
                                         description => $ref->{description} );
       }
@@ -1208,15 +1370,19 @@ sub defaultaccounts {
   $sth->finish;
 
 
-  $query = qq|SELECT id, accno, description
-              FROM chart
-	      WHERE (category = 'I' OR category = 'E')
-	      AND charttype = 'A'
-              ORDER BY accno|;
+  $query = qq|SELECT c.id, c.accno, c.description,
+              l.description AS translation
+              FROM chart c
+	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+	      WHERE (c.category = 'I' OR c.category = 'E')
+	      AND c.charttype = 'A'
+              ORDER BY c.accno|;
   $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
 
   while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    $ref->{description} = $ref->{translation} if $ref->{translation};
+
     %{ $form->{accno}{FX_gain}{$ref->{accno}} } = ( id => $ref->{id},
                                       description => $ref->{description} );
     %{ $form->{accno}{FX_loss}{$ref->{accno}} } = ( id => $ref->{id},
@@ -1236,15 +1402,18 @@ sub taxes {
   my $dbh = $form->dbconnect($myconfig);
   
   my $query = qq|SELECT c.id, c.accno, c.description,
-              t.rate * 100 AS rate, t.taxnumber, t.validto
+              t.rate * 100 AS rate, t.taxnumber, t.validto,
+	      l.description AS translation
               FROM chart c
 	      JOIN tax t ON (c.id = t.chart_id)
+	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
 	      ORDER BY 3, 6|;
 
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
 
   while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    $ref->{description} = $ref->{translation} if $ref->{translation};
     push @{ $form->{taxrates} }, $ref;
   }
   $sth->finish;
@@ -1288,25 +1457,26 @@ sub backup {
   my $mail;
   my $err;
   
-  my @t = localtime(time);
+  my @t = localtime;
   $t[4]++;
   $t[5] += 1900;
   $t[3] = substr("0$t[3]", -2);
   $t[4] = substr("0$t[4]", -2);
 
   my $boundary = time;
-  my $tmpfile = "$userspath/$boundary.$myconfig->{dbname}-$form->{dbversion}-$t[5]$t[4]$t[3].sql";
+  my $tmpfile = "$userspath/$boundary.$myconfig->{dbname}-$form->{version}-$t[5]$t[4]$t[3].sql";
   my $out = $form->{OUT};
   $form->{OUT} = ">$tmpfile";
 
   open(OUT, "$form->{OUT}") or $form->error("$form->{OUT} : $!");
 
   # get sequences, functions and triggers
-  my @tables = ();
-  my @sequences = ();
-  my @functions = ();
-  my @triggers = ();
-  my @schema = ();
+  my %tables;
+  my %references;
+  my %sequences;
+  my @functions;
+  my @triggers;
+  my @schema;
   
   # get dbversion from -tables.sql
   my $file = "$myconfig->{dbdriver}-tables.sql";
@@ -1316,19 +1486,20 @@ sub backup {
   my @a = <FH>;
   close(FH);
 
-  @dbversion = grep /defaults \(version\)/, @a;
+  @dbversion = grep /VALUES \(.{1}version.{1}, .*\){1}/, @a;
   
   $dbversion = "@dbversion";
   $dbversion =~ /(\d+\.\d+\.\d+)/;
+
   $dbversion = User::calc_version($1);
-  
+
   opendir SQLDIR, "sql/." or $form->error($!);
   @a = grep /$myconfig->{dbdriver}-upgrade-.*?\.sql$/, readdir SQLDIR;
   closedir SQLDIR;
 
   my $mindb;
   my $maxdb;
-  
+
   foreach my $line (@a) {
 
     $upgradescript = $line;
@@ -1344,7 +1515,6 @@ sub backup {
     $upgradescripts{$maxdb} = $upgradescript;
   }
 
-
   $upgradescripts{$dbversion} = "$myconfig->{dbdriver}-tables.sql";
   $upgradescripts{functions} = "$myconfig->{dbdriver}-functions.sql";
 
@@ -1354,6 +1524,8 @@ sub backup {
   if (-f "sql/$myconfig->{dbdriver}-custom_functions.sql") {
     $upgradescripts{customfunctions} = "$myconfig->{dbdriver}-custom_functions.sql";
   }
+  
+  my $el;
   
   foreach my $key (sort keys %upgradescripts) {
 
@@ -1365,12 +1537,17 @@ sub backup {
    
     while (<FH>) {
 
+      if (/references (\w+)/i) {
+	$references{$el} = 1;
+      }
+      
       if (/create table (\w+)/i) {
-	push @tables, $1;
+	$el = $1;
+	$tables{$1} = 1;
       }
 
       if (/create sequence (\w+)/i) {
-	push @sequences, $1;
+	$sequences{$1} = 1;
 	next;
       }
 
@@ -1422,7 +1599,7 @@ sub backup {
   
   print OUT qq|-- SQL-Ledger Backup
 -- Dataset: $myconfig->{dbname}
--- Version: $form->{dbversion}
+-- Version: $form->{version}
 -- Host: $myconfig->{dbhost}
 -- Login: $form->{login}
 -- User: $myconfig->{name}
@@ -1430,10 +1607,17 @@ sub backup {
 --
 |;
 
- 
-  @tables = grep !/^temp/, @tables;
+
+  # drop references first
+  for (keys %references) { print OUT qq|DROP TABLE $_;\n| }
+  
+  delete $tables{temp};
   # drop tables and sequences
-  for (@tables) { print OUT qq|DROP TABLE $_;\n| }
+  for (keys %tables) {
+    if (! exists $references{$_}) {
+      print OUT qq|DROP TABLE $_;\n|;
+    }
+  }
 
   print OUT "--\n";
   
@@ -1446,8 +1630,9 @@ sub backup {
     }
   }
   
+  delete $sequences{tempid};
   # create sequences
-  foreach $item (@sequences) {
+  foreach $item (keys %sequences) {
     if ($myconfig->{dbdriver} eq 'DB2') {
       $query = qq|SELECT NEXTVAL FOR $item FROM sysibm.sysdummy1|;
     } else {
@@ -1464,14 +1649,12 @@ CREATE SEQUENCE $item AS INTEGER START WITH $id INCREMENT BY 1 MAXVALUE 21474836
 	print OUT qq|CREATE SEQUENCE $item;
 SELECT SETVAL('$item', $id, FALSE);\n|;
       } else {
-	print OUT qq|DROP SEQUENCE $item
+	print OUT qq|DROP SEQUENCE $item;
 CREATE SEQUENCE $item START $id;\n|;
       }
     }
   }
  
-  print OUT "--\n";
-
   # add schema
   print OUT @schema;
   print OUT "\n";
@@ -1486,7 +1669,9 @@ $myconfig->{dboptions};
   my @arr;
   my $fields;
   
-  foreach $table (@tables) {
+  delete $tables{semaphore};
+  
+  foreach $table (keys %tables) {
 
     $query = qq|SELECT * FROM $table|;
     $sth = $dbh->prepare($query);
@@ -1549,7 +1734,7 @@ $myconfig->{dboptions};
 
     $mail->{to} = qq|"$myconfig->{name}" <$myconfig->{email}>|;
     $mail->{from} = qq|"$myconfig->{name}" <$myconfig->{email}>|;
-    $mail->{subject} = "SQL-Ledger Backup / $myconfig->{dbname}-$form->{dbversion}-$t[5]$t[4]$t[3].sql$suffix";
+    $mail->{subject} = "SQL-Ledger Backup / $myconfig->{dbname}-$form->{version}-$t[5]$t[4]$t[3].sql$suffix";
     @{ $mail->{attachments} } = ($tmpfile);
     $mail->{version} = $form->{version};
     $mail->{fileid} = "$boundary.";
@@ -1566,7 +1751,7 @@ $myconfig->{dboptions};
     open(OUT, ">-") or $form->error("STDOUT : $!");
    
     print OUT qq|Content-Type: application/file;
-Content-Disposition: attachment; filename="$myconfig->{dbname}-$form->{dbversion}-$t[5]$t[4]$t[3].sql$suffix"
+Content-Disposition: attachment; filename="$myconfig->{dbname}-$form->{version}-$t[5]$t[4]$t[3].sql$suffix"
 
 |;
     binmode(IN);
@@ -1590,13 +1775,12 @@ sub closedto {
   my ($self, $myconfig, $form) = @_;
 
   my $dbh = $form->dbconnect($myconfig);
-
-  my $query = qq|SELECT closedto, revtrans, audittrail
-                 FROM defaults|;
-  ($form->{closedto}, $form->{revtrans}, $form->{audittrail}) = $dbh->selectrow_array($query);
   
-  $dbh->disconnect;
+  my %defaults = $form->get_defaults($dbh, \@{[qw(closedto revtrans audittrail)]});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
 
+  $dbh->disconnect;
+  
 }
 
  
@@ -1604,24 +1788,25 @@ sub closebooks {
   my ($self, $myconfig, $form) = @_;
 
   my $dbh = $form->dbconnect_noauto($myconfig);
-  my $query = qq|UPDATE defaults SET|;
+  my $query = qq|DELETE FROM defaults
+                 WHERE fldname = ?|;
+  my $dth = $dbh->prepare($query) || $form->dberror($query);
 
-  if ($form->{revtrans}) {
-    $query .= qq| revtrans = '1'|;
-  } else {
-    $query .= qq| revtrans = '0'|;
+  $query = qq|INSERT INTO defaults (fldname, fldvalue)
+              VALUES (?, ?)|;
+  my $sth = $dbh->prepare($query) || $form->dberror($query);
+
+  $form->{closedto} = $form->datetonum($myconfig, $form->{closedto});
+  for (qw(revtrans closedto audittrail aruniq apuniq gluniq souniq pouniq trackinguniq nontrackinguniq)) {
+    $dth->execute($_) || $form->dberror;
+    $dth->finish;
+
+    if ($form->{$_}) {
+      $sth->execute($_, $form->{$_}) || $form->dberror;
+      $sth->finish;
+    }
   }
-  $query .= qq|, closedto = |.$form->dbquote($form->{closedto}, SQL_DATE);
-  
-  if ($form->{audittrail}) {
-    $query .= qq|, audittrail = '1'|;
-  } else {
-    $query .= qq|, audittrail = '0'|;
-  }
-
-  # set close in defaults
-  $dbh->do($query) || $form->dberror($query);
-
+      
   if ($form->{removeaudittrail}) {
     $query = qq|DELETE FROM audittrail
                 WHERE transdate < '$form->{removeaudittrail}'|;
@@ -1643,22 +1828,29 @@ sub earningsaccounts {
   my $dbh = $form->dbconnect($myconfig);
   
   # get chart of accounts
-  $query = qq|SELECT accno,description
-              FROM chart
-              WHERE charttype = 'A'
-	      AND category = 'Q'
-              ORDER by accno|;
+  $query = qq|SELECT c.accno, c.description,
+              l.description AS translation
+              FROM chart c
+	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+              WHERE c.charttype = 'A'
+	      AND c.category = 'Q'
+              ORDER by c.accno|;
   $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
   $form->{chart} = "";
 						  
   while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    $ref->{description} = $ref->{translation} if $ref->{translation};
     push @{ $form->{chart} }, $ref;
   }
   $sth->finish;
 
+  my %defaults = $form->get_defaults($dbh, \@{['method', 'precision']});
+  $form->{precision} = $defaults{precision};
+  $form->{method} ||= "accrual";
+  
   $dbh->disconnect;
-	      
+      
 }
 
 
@@ -1670,16 +1862,19 @@ sub post_yearend {
 
   my $query;
   my $uid = localtime;
-  $uid .= "$$";
+  $uid .= $$;
 
-  $query = qq|INSERT INTO gl (reference, employee_id)
+  my $curr = substr($form->get_currencies($dbh, $myconfig),0,3);
+  $query = qq|INSERT INTO gl (reference, employee_id, curr)
 	      VALUES ('$uid', (SELECT id FROM employee
-			       WHERE login = '$form->{login}'))|;
+			       WHERE login = '$form->{login}'), '$curr')|;
   $dbh->do($query) || $form->dberror($query);
   
   $query = qq|SELECT id FROM gl
 	      WHERE reference = '$uid'|;
   ($form->{id}) = $dbh->selectrow_array($query);
+
+  $form->{reference} = $form->update_defaults($myconfig, 'glnumber', $dbh) unless $form->{reference};
 
   $query = qq|UPDATE gl SET 
 	      reference = |.$dbh->quote($form->{reference}).qq|,
@@ -1739,6 +1934,444 @@ sub post_yearend {
   $dbh->disconnect;
 
   $rc;
+
+}
+
+
+sub company_defaults {
+  my ($self, $myconfig, $form) = @_;
+
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+  
+  my %defaults = $form->get_defaults($dbh, \@{['company','address']});
+  for (keys %defaults) { $form->{$_} = $defaults{$_} }
+  
+  $dbh->disconnect;
+      
+}
+
+
+sub bank_accounts {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+
+  my $query = qq|SELECT c.id, c.accno, c.description,
+                 bk.name, bk.iban, bk.bic, bk.membernumber, bk.dcn, bk.rvc,
+		 ad.address1, ad.address2, ad.city,
+                 ad.state, ad.zipcode, ad.country,
+		 l.description AS translation
+                 FROM chart c
+		 LEFT JOIN bank bk ON (bk.id = c.id)
+		 LEFT JOIN address ad ON (c.id = ad.trans_id)
+		 LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+		 WHERE c.link LIKE '%AR_paid%'
+		 ORDER BY 2|;
+
+  my $sth = $dbh->prepare($query);
+  $sth->execute || $form->dberror($query);
+
+  my $ref;
+  
+  while ($ref = $sth->fetchrow_hashref(NAME_lc)) {
+    $ref->{address} = "";
+    for (qw(address1 address2 city state zipcode country)) {
+      $ref->{address} .= "$ref->{$_}\n" if $ref->{$_};
+    }
+    chop $ref->{address};
+
+    $ref->{description} = $ref->{translation} if $ref->{translation};
+
+    push @{ $form->{ALL} }, $ref;
+  }
+  $sth->finish;
+
+  $dbh->disconnect;
+  
+}
+
+
+sub get_bank {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+
+  $query = qq|SELECT c.accno, c.description,
+              bk.name, bk.iban, bk.bic, bk.membernumber, bk.dcn, bk.rvc,
+	      ad.address1, ad.address2, ad.city,
+              ad.state, ad.zipcode, ad.country,
+	      l.description AS translation
+	      FROM chart c
+	      LEFT JOIN bank bk ON (c.id = bk.id)
+	      LEFT JOIN address ad ON (c.id = ad.trans_id)
+	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
+	      WHERE c.id = $form->{id}|;
+  $sth = $dbh->prepare($query);
+  $sth->execute || $form->dberror($query);
+
+  $ref = $sth->fetchrow_hashref(NAME_lc);
+  $ref->{account} = "$ref->{accno}--";
+  $ref->{account} .= ($ref->{translation}) ? $ref->{translation} : $ref->{description};
+  for (keys %$ref) { $form->{$_} = $ref->{$_} }
+  $sth->finish;
+
+  $dbh->disconnect;
+
+}
+
+
+sub save_bank {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+
+  my $query = qq|SELECT id FROM bank
+                 WHERE id = $form->{id}|;
+  my ($id) = $dbh->selectrow_array($query);
+
+  my $ok;
+  for (qw(name iban bic address1 address2 city state zipcode country membernumber rvc dcn)) {
+    if ($form->{$_}) {
+      $ok = 1;
+      last;
+    }
+  }
+
+  if ($ok) {
+    if ($id) {
+      $query = qq|UPDATE bank SET
+		  name = |.$dbh->quote(uc $form->{name}).qq|,
+		  iban = |.$dbh->quote($form->{iban}).qq|,
+		  bic = |.$dbh->quote(uc $form->{bic}).qq|,
+		  membernumber = |.$dbh->quote($form->{membernumber}).qq|,
+		  rvc = |.$dbh->quote($form->{rvc}).qq|,
+		  dcn = |.$dbh->quote($form->{dcn}).qq|
+		  WHERE id = $form->{id}|;
+      $dbh->do($query) || $form->dberror($query);
+    } else {
+      $query = qq|INSERT INTO address (trans_id)
+		  VALUES ($form->{id})|;
+      $dbh->do($query) || $form->dberror($query);
+
+      $query = qq|INSERT INTO bank (id, name, iban, bic, membernumber, rvc, dcn)
+		  VALUES ($form->{id}, |
+		  .$dbh->quote(uc $form->{name}).qq|, |
+		  .$dbh->quote(uc $form->{iban}).qq|, |
+		  .$dbh->quote($form->{bic}).qq|, |
+		  .$dbh->quote($form->{membernumber}).qq|, |
+		  .$dbh->quote($form->{rvc}).qq|, |
+		  .$dbh->quote($form->{dcn}).qq|
+		  )|;
+      $dbh->do($query) || $form->dberror($query);
+    }
+    
+    $query = qq|UPDATE address SET
+		address1 = |.$dbh->quote(uc $form->{address1}).qq|,
+		address2 = |.$dbh->quote(uc $form->{address2}).qq|,
+		city = |.$dbh->quote(uc $form->{city}).qq|,
+		state = |.$dbh->quote(uc $form->{state}).qq|,
+		zipcode = |.$dbh->quote(uc $form->{zipcode}).qq|,
+		country = |.$dbh->quote(uc $form->{country}).qq|
+		WHERE trans_id = $form->{id}|;
+    $dbh->do($query) || $form->dberror($query);
+
+  } else {
+    $query = qq|DELETE FROM bank
+                WHERE id = $form->{id}|;
+    $dbh->do($query) || $form->dberror($query);
+    
+    $query = qq|DELETE FROM address
+                WHERE trans_id = $form->{id}|;
+    $dbh->do($query) || $form->dberror($query);
+
+  }
+
+  my $rc = $dbh->commit;
+
+  $dbh->disconnect;
+
+  $rc;
+
+}
+
+
+sub exchangerates {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+
+  $form->{currencies} = $form->get_currencies($dbh, $myconfig);
+
+  $form->all_years($myconfig);
+
+  $dbh->disconnect;
+
+}
+
+
+
+sub get_exchangerates {
+  my ($self, $myconfig, $form) = @_;
+
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+
+  my $where = "1 = 1";
+
+  my @a = qw(transdate);
+  my $sortorder = $form->sort_order(\@a);
+
+  $form->{currencies} = $form->get_currencies($dbh, $myconfig);
+
+  ($form->{transdatefrom}, $form->{transdateto}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
+  
+  $where .= " AND transdate >= '$form->{transdatefrom}'" if $form->{transdatefrom};
+  $where .= " AND transdate <= '$form->{transdateto}'" if $form->{transdateto};   
+  $where .= " AND curr = '$form->{currency}'" if $form->{currency};
+  
+  my $query = qq|SELECT * FROM exchangerate
+                 WHERE $where
+		 ORDER BY $sortorder|;
+
+  my $sth = $dbh->prepare($query);
+  $sth->execute || $form->dberror($query);
+
+  while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    push @{ $form->{transactions} }, $ref;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+
+}
+
+
+sub save_exchangerate {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+  
+  my $query;
+  my $sth;
+  my $dth;
+
+  $query = qq|DELETE FROM exchangerate
+	      WHERE transdate = ?
+	      AND curr = ?|;
+  $dth = $dbh->prepare($query) || $form->dberror($query);
+    
+  $query = qq|INSERT INTO exchangerate
+	      (transdate, buy, sell, curr)
+	      VALUES (?,?,?,?)|;
+  $sth = $dbh->prepare($query) || $form->dberror($query);
+
+  for (split /:/, $form->{currencies}) {
+    
+    if ($form->{$_}) {
+      
+      $dth->execute($form->{transdate}, $_) || $form->dberror;
+      $dth->finish;
+      
+      $form->{"${_}buy"} *= 1;
+      $form->{"${_}sell"} *= 1;
+      
+      if ($form->{"${_}buy"} || $form->{"${_}sell"}) {
+	$sth->execute($form->{transdate}, $form->{"${_}buy"}, $form->{"${_}sell"}, $_) || $form->dberror;
+	$sth->finish;
+      }
+    }
+  }
+  
+  $dbh->commit;
+  $dbh->disconnect;
+
+}
+
+
+sub remove_locks {
+  my ($self, $myconfig, $form) = @_;
+  
+  $dbh = $form->dbconnect($myconfig);
+
+  my $query = qq|DELETE FROM semaphore|;
+  $dbh->do($query) || $form->dberror($query);
+
+  $dbh->disconnect;
+
+}
+
+
+sub currencies {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+  
+  $form->{sort} = "rn" unless $form->{sort};
+  my @a = qw(rn curr);
+  my %ordinal = ( rn	=> 1,
+                  curr	=> 2 );
+  my $sortorder = $form->sort_order(\@a, \%ordinal);
+
+  my $query = qq|SELECT * FROM curr
+		 ORDER BY $sortorder|;
+  $sth = $dbh->prepare($query);
+  $sth->execute || $form->dberror($query);
+
+  while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
+    push @{ $form->{ALL} }, $ref;
+  }
+  $sth->finish;
+
+  $dbh->disconnect;
+  
+}
+
+
+sub get_currency {
+  my ($self, $myconfig, $form) = @_;
+
+  # connect to database
+  my $dbh = $form->dbconnect($myconfig);
+  
+  my $query = qq|SELECT * FROM curr
+	         WHERE curr = '$form->{curr}'|;
+  my $sth = $dbh->prepare($query) || $form->dberror($query);
+  $sth->execute;
+  
+  my $ref = $sth->fetchrow_hashref(NAME_lc);
+  for (keys %$ref) { $form->{$_} = $ref->{$_} }
+  $sth->finish;
+
+  $query = qq|SELECT DISTINCT curr FROM ar WHERE curr = '$form->{curr}'
+        UNION SELECT DISTINCT curr FROM ap WHERE curr = '$form->{curr}'
+	UNION SELECT DISTINCT curr FROM oe WHERE curr = '$form->{curr}'|;
+  ($form->{orphaned}) = $dbh->selectrow_array($query);
+  $form->{orphaned} = !$form->{orphaned};
+
+  $dbh->disconnect;
+
+}
+
+
+sub save_currency {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+  
+  $form->{curr} = substr($form->{curr}, 0, 3);
+
+  $query = qq|SELECT curr
+	      FROM curr
+	      WHERE curr = '$form->{curr}'|;
+  my ($curr) = $dbh->selectrow_array($query);
+
+  my $rn;
+  
+  if (!$curr) {
+    $query = qq|SELECT MAX(rn) FROM curr|;
+    ($rn) = $dbh->selectrow_array($query);
+    $rn++;
+    
+    $query = qq|INSERT INTO curr (rn, curr)
+                VALUES ($rn, '$form->{curr}')|;
+    $dbh->do($query) || $form->dberror($query);
+  }
+
+  for (qw(precision)) { $form->{$_} *= 1 }
+  $query = qq|UPDATE curr SET
+	      precision = $form->{precision}
+	      WHERE curr = '$form->{curr}'|;
+  $dbh->do($query) || $form->dberror($query);
+
+  my $rc = $dbh->commit;
+  $dbh->disconnect;
+
+  $rc;
+
+}
+
+
+sub delete_currency {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+  
+  my $query = qq|SELECT rn FROM curr
+                 WHERE curr = '$form->{curr}'|;
+  my ($rn) = $dbh->selectrow_array($query);
+  
+  $query = qq|UPDATE curr SET rn = rn - 1
+              WHERE rn > $rn|;
+  $dbh->do($query) || $form->dberror($query);
+
+  $query = qq|DELETE FROM curr
+	      WHERE curr = '$form->{curr}'|;
+  $dbh->do($query) || $form->dberror($query);
+ 
+  my $rc = $dbh->commit;
+  $dbh->disconnect;
+
+  $rc;
+
+}
+
+
+sub move {
+  my ($self, $myconfig, $form) = @_;
+  
+  # connect to database
+  my $dbh = $form->dbconnect_noauto($myconfig);
+  
+  my $id;
+  
+  my $query = qq|SELECT rn FROM $form->{db}
+                 WHERE $form->{fld} = '$form->{id}'|;
+  my ($rn) = $dbh->selectrow_array($query);
+
+  $query = qq|SELECT MAX(rn) FROM $form->{db}|;
+  my ($lastrn) = $dbh->selectrow_array($query);
+  
+  if ($form->{move} eq 'down' && $rn != $lastrn) {
+    $query = qq|SELECT $form->{fld} FROM $form->{db}
+	        WHERE rn = $rn + 1|;
+    ($id) = $dbh->selectrow_array($query);
+
+    $query = qq|UPDATE $form->{db} SET rn = $rn + 1
+                WHERE $form->{fld} = '$form->{id}'|;
+    $dbh->do($query) || $form->dberror($query);
+
+    $query = qq|UPDATE $form->{db} SET rn = $rn
+                WHERE $form->{fld} = '$id'|;
+    $dbh->do($query) || $form->dberror($query);
+  }
+  
+  if ($form->{move} eq 'up' && $rn > 1) {
+    $query = qq|SELECT $form->{fld} FROM $form->{db}
+	        WHERE rn = $rn - 1|;
+    ($id) = $dbh->selectrow_array($query);
+
+    $query = qq|UPDATE $form->{db} SET rn = $rn - 1
+                WHERE $form->{fld} = '$form->{id}'|;
+    $dbh->do($query) || $form->dberror($query);
+
+    $query = qq|UPDATE $form->{db} SET rn = $rn
+                WHERE $form->{fld} = '$id'|;
+    $dbh->do($query) || $form->dberror($query);
+  }
+  
+  my $rc = $dbh->commit;
+  $dbh->disconnect;
+
+  $rc;
+
 
 }
 

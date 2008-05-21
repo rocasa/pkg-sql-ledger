@@ -27,8 +27,8 @@ exit 0
 @@ -0,0 +1,18 @@
 +PACKAGE = sql-ledger
 +
-+# Assumption: only the menu.pl differs between each directory
-+MODULES = $(shell find mozilla/ -name '*.pl' | sed -e 's|mozilla/||' | grep -v menu.pl) 
++# Assumption: only the menu/login/admin.pl differs between each directory
++MODULES = $(shell find mozilla/ -name '*.pl' | sed -e 's|mozilla/||' | grep -v menu.pl | grep -v login.pl | grep -v admin.pl) 
 +SUBDIRS = lynx mozilla
 +
 +all:
@@ -78,7 +78,7 @@ exit 0
 @@ -0,0 +1,14 @@
 +PACKAGE = sql-ledger
 +
-+FILES	= *.html *.tex *.txt
++FILES	= *.html *.tex *.txt *.eps *.png
 +	  
 +all:
 +
@@ -193,7 +193,7 @@ exit 0
 +
 +LIB_FILES = am.pl favicon.ico login.pl menu.ini setup.pl \
 +            sql-ledger.conf.default VERSION index.html \
-+            sql-ledger.png sql-ledger.gif
++            images
 +
 +
 +CFG_FILES = sql-ledger-httpd.conf sql-ledger.conf
@@ -202,7 +202,7 @@ exit 0
 +
 +install: 
 +	mkdir -p $(DESTDIR)/usr/share/sql-ledger
-+	cp  $(LIB_FILES) $(DESTDIR)/usr/share/sql-ledger
++	cp -a $(LIB_FILES) $(DESTDIR)/usr/share/sql-ledger/
 +	
 +	
 +

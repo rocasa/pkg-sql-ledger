@@ -1,4 +1,5 @@
 $self{texts} = {
+  'AR/AP'                       => 'Kreditor/Debitor',
   'Account'                     => 'Konto',
   'Apr'                         => 'apr',
   'April'                       => 'april',
@@ -42,6 +43,7 @@ $self{texts} = {
   'Reference'                   => 'Reference',
   'Sep'                         => 'sep',
   'September'                   => 'september',
+  'Source'                      => 'Bilag',
   'Subtotal'                    => 'Subtotal',
   'To'                          => 'til',
   'Year'                        => 'År',

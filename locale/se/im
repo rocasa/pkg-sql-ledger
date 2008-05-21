@@ -1,0 +1,39 @@
+$self{texts} = {
+  'Account'                     => 'Konto',
+  'City'                        => 'Stad',
+  'Company'                     => 'Företag',
+  'Continue'                    => 'Fortsätt',
+  'Curr'                        => 'Valuta',
+  'Currency'                    => 'Valuta',
+  'Customer'                    => 'Kund',
+  'Customer Number'             => 'Kund nr',
+  'Date Paid'                   => 'Betalningsdatum',
+  'Description'                 => 'Beskrivning',
+  'Due Date'                    => 'Förfallodatum',
+  'Exch'                        => 'Vxl',
+  'Invoice'                     => 'Faktura',
+  'Invoice Date'                => 'Fakturadatum',
+  'Invoice Number'              => 'Fakturanummer',
+  'No'                          => 'Inga',
+  'Paid'                        => 'Betalt',
+  'Posting failed!'             => 'Bokföring misslyckats!',
+  'Qty'                         => 'Antal',
+  'Salesperson'                 => 'Försäljare',
+  'Total'                       => 'Total',
+  'Unit'                        => 'Enhet',
+  'Yes'                         => 'Ja',
+};
+
+$self{subs} = {
+  'continue'                    => 'continue',
+  'display_payment'             => 'display_payment',
+  'display_sales_invoice'       => 'display_sales_invoice',
+  'import'                      => 'import',
+  'import_payments'             => 'import_payments',
+  'import_sales_invoices'       => 'import_sales_invoices',
+  'xrefhdr'                     => 'xrefhdr',
+  'fortsätt'                    => 'continue',
+};
+
+1;
+

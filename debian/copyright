@@ -3,7 +3,9 @@ Sun,  4 May 2003 05:21:25 +0200.
 
 It was downloaded from http://prdownloads.sourceforge.net/sql-ledger/sql-ledger-2.0.6.tar.gz?download
 
-Upstream Author: Dieter Simader dsimader@sql-ledger.org
+Upstream Author: Dieter Simader <dsimader@sql-ledger.org>
+
+    Copyright (c) 1999 - 2007, DWS Systems Inc.
 
 Brazilian texts:
  Author: Andre Felipe Machado <andremachado@techforce.com.br>
@@ -13,7 +15,7 @@ Simplified Chinese texts:
 Spanish texts:
 Adoption to Colombian Accounting Terms:
 Authors: 	Dirk Enrique Seiffert <info@caribenet.com> 
-	Lourdes Mejía Martinez <lourdes@caribenet.com>
+	Lourdes MejÃ­a Martinez <lourdes@caribenet.com>
 	Silfredo Godoy Chavez <silfredo@caribenet.com>
 
 Catalan Translation:
@@ -24,7 +26,7 @@ German texts:
  Author: Thomas Bayen <tbayen@bayen.de>
          Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
 Danish texts:
- Author: Keld Jørn Simonsen <keld@dkuug.dk>
+ Author: Keld JÃ¸rn Simonsen <keld@dkuug.dk>
          Jonas Smedegaard <jonas@jones.dk>
 Estonian texts:
  Author: Martin Lillepuu <martin@lillepuu.com>
@@ -44,22 +46,22 @@ Spanish texts:
  Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
          John Stoddart <jstypo@imagencolor.com.ve>
          Federico Montesino Pouzols <fedemp@arrok.com>
-         Tomás Pereira <topec@percar.com>
+         TomÃ¡s Pereira <topec@percar.com>
 Spanish texts:
  Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
          John Stoddart <jstypo@imagencolor.com.ve>
          Federico Montesino Pouzols <fedemp@arrok.com>
-         Tomás Pereira <topec@percar.com>
+         TomÃ¡s Pereira <topec@percar.com>
 Finish texts:
- Author: Petri Leppänen <mpj@mail.htk.fi>
+ Author: Petri LeppÃ¤nen <mpj@mail.htk.fi>
 French texts:
- Author: Sèbastien Brassard <sbrassar.cgocable.ca>
+ Author: SÃ¨bastien Brassard <sbrassar.cgocable.ca>
          Oscar Buijten <oscar@elbie.com>
          Wolfgang Sourdeau <wolfgang@contre.com>
          Aguibou KONE <aguibou.kone@rocketmail.com>
          Jens-Ingo Brodesser <jens-ingo@all2all.org>
 Hungarian texts:
- Author: Kabai József <kabai@investor.hu>
+ Author: Kabai JÃ³zsef <kabai@investor.hu>
 Icelandic texts:
  Author: Margeir Reynisson <margeir@met.is>
 Italian texts:
@@ -79,7 +81,7 @@ Dutch texts:
          Bert Tijhuis <domino@dse.nl>
          Paul Tammes <ptammes@home.nl>
 Norwegian texts:
- Author: Keld Jørn Simonsen <keld@dkuug.dk>
+ Author: Keld JÃ¸rn Simonsen <keld@dkuug.dk>
          Morten Pedersen <morten@workzone.no>
          Finn-Arne Johansen <faj@bzz.no>
          Petter Reinholdtsen <pere@hungry.com>
@@ -95,7 +97,7 @@ Swedish texts:
  Author: Jonny Larsson <jonny@lernbo.com>
          Daniel Andersson <daniel@addelei.nu>
 Spanish texts:
- Author: Carlos López Linares <chlopezl@yahoo.com>
+ Author: Carlos LÃ³pez Linares <chlopezl@yahoo.com>
 Turkish texts:
  Author: Mufit Eribol <meribol@deltagrup.com.tr>
 Traditional Chinese texts:

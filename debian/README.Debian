@@ -23,12 +23,10 @@ http://www.securityfocus.com/archive/1/445817
 CONFIGURATION INFORMATION
 -------------------------
 
-To test this package you need to add this line to you
-/etc/apache/httpd.conf:
+To test this package you need to add this line to your
+apache configuration, either in a virtual host configuration, or in the
+global configuration (for example in /etc/apache2/conf.d/sql-ledger.conf):
  include /etc/sql-ledger/sql-ledger-httpd.conf
-or, if you run apache >= 1.3.29.0.1, please a symlink from
-/etc/sql-ledger/sql-ledger-httpd.conf to /etc/apache/conf.d
-then restart apache. 
 
 You also have to add some users to your postgres DB
 
@@ -37,7 +35,7 @@ the name of www-data. This however will mean that every apache process
 will be able to authenticate to your DB.
 
 To make a more robust security scheme, please read your postgres
-documentation, but for now, do , as root, a
+documentation, but for now, do, as root, a
 
  su - postgres
  createuser -d www-data
