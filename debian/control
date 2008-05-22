@@ -1,8 +1,8 @@
 Source: sql-ledger
 Section: web
 Priority: optional
-Maintainer: Finn-Arne Johansen <faj@bzz.no>
-Uploaders: Petter Reinholdtsen <pere@debian.org>, Raphael Hertzog <hertzog@debian.org>, Gerardo Reynoso <greynoso@tindes.com>
+Maintainer: Raphael Hertzog <hertzog@debian.org>
+Uploaders: Petter Reinholdtsen <pere@debian.org>, Gerardo Reynoso <greynoso@tindes.com>
 Build-Depends: debhelper (>= 5), dpatch
 Homepage: http://www.sql-ledger.com
 Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk

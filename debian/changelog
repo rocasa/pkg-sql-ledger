@@ -1,3 +1,12 @@
+sql-ledger (2.8.14-2) unstable; urgency=low
+
+  * Remove Finn-Arne Johansen from Maintainer field (on his request)
+    and moved myself there. I'll continue to maintain the package in
+    low-maintenance mode until smbledger is properly supported in Debian.
+    Feel free to step in and help.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Thu, 22 May 2008 09:14:07 +0200
+
 sql-ledger (2.8.14-1) unstable; urgency=low
 
   * New upstream release. 
