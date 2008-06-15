@@ -1,3 +1,17 @@
+sql-ledger (2.8.15-1) unstable; urgency=low
+
+  * New upstream release.
+    * Invoice printing now works with perl 5.10. Closes: #484455
+  * Use dh_lintian to install lintian overrides. Build-depend on
+    debhelper (>= 6.0.7) for this.
+  * Switch to quilt to manage patches. Ajust build-dependency and
+    debian/rules and debian/patches/* accordingly.
+  * Drop patch 05improve-sec-check which is merged upstream.
+  * Refresh all remaining patches.
+  * Switch to debhelper 7 and its associated rules file minimization.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sun, 15 Jun 2008 12:04:31 +0200
+
 sql-ledger (2.8.14-2) unstable; urgency=low
 
   * Remove Finn-Arne Johansen from Maintainer field (on his request)

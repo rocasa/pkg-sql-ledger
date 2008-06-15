@@ -1,95 +1,29 @@
 #!/usr/bin/make -f
-# GNU copyright 2004 by Petter Reinholdtsen
 
-include /usr/share/dpatch/dpatch.make
+include /usr/share/quilt/quilt.make
 
-DESTDIR = $(CURDIR)/debian/sql-ledger
-
-INSTALL = install
-
-configure: configure-stamp
-configure-stamp: patch-stamp
-	dh_testdir
-	# Add here commands to configure the package.
-
-	touch configure-stamp
-
-build: build-stamp
-build-stamp: configure-stamp 
-	dh_testdir
-
-	# Add here commands to compile the package.
-	$(MAKE)
-
-	touch build-stamp
+build: patch
+	dh build
 
 clean: unpatch
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	#-$(MAKE) clean
+	dh clean
 	rm -f sql-ledger.conf
 
-	dh_clean
-
 install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-
 	# Add here commands to install the package into debian/sql-ledger.
 	sed -e 's|^\$$userspath = .*$$|$$userspath = "/var/lib/sql-ledger/users";|' \
 	    -e 's|^\$$memberfile = .*$$|$$memberfile = "/var/lib/sql-ledger/users/members";|' \
 	sql-ledger.conf.default > sql-ledger.conf
-	
-	$(MAKE) install DESTDIR=$(DESTDIR)
-	# Install lintian overrides
-	mkdir -p $(DESTDIR)/usr/share/lintian/overrides/
-	cp debian/sql-ledger.lintian-overrides $(DESTDIR)/usr/share/lintian/overrides/sql-ledger
-
+	dh install
 
 # Build architecture-independent files here.
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-#	dh_installdebconf	
-	dh_installdocs
-	dh_installexamples
-	dh_installmenu
-	dh_installcron
-	dh_installman
-	dh_installinfo
-	dh_installchangelogs 
-	dh_link /usr/share/sql-ledger /usr/lib/sql-ledger
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_perl
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+binary-indep: install
+	dh binary-indep
 
 # Build architecture-dependent files here.
-binary-arch: build install
-# We have nothing to do by default.
+binary-arch: install
+	dh binary-arch
 
 binary: binary-indep binary-arch
 
-# Generate new copyright file with the copyright info for each
-# translation as well as the package itself.
-debian/copyright: unpack patch-stamp
-	cat debian/copyright.pre > debian/copyright
-	set -e ; \
-	for file in locale/*/COPYING ; do \
-	  HEAD=$$(grep -n '# This program is free software' $$file |cut -f1 -d:); \
-	  HEAD=`expr $$HEAD - 1`; \
-	  head -$$HEAD $$file | tail +4 ; \
-	done | grep -v '^#$$' | sed -e 's/^#[ 	]//' >> debian/copyright
-	cat debian/copyright.post >> debian/copyright
-
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build clean binary-indep binary-arch binary install

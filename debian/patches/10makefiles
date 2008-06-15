@@ -1,29 +1,9 @@
-#! /bin/sh -e
-## 10makefiles.dpatch by Petter Reinholdtsen <pere@hungry.com>
-##
-## All lines beginning with `## DP:' are a description of the patch.
-##
-## DP: Build/install rules for sql-ledger
+Description: Add some makefiles to be able to copy the required files
+ in place without using the too invasive setup.pl.
+Forwarded-Upstream: not yet tried
 
-[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
-patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
-
-if [ $# -ne 1 ]; then
-    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-    exit 1
-fi
-case "$1" in
-       -patch)   ( patch $patch_opts -p1 ) < $0 ;;
-       -unpatch) ( patch $patch_opts -p1 -R ) < $0 ;;
-        *)
-                echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-                exit 1;;
-esac
-
-exit 0
-@DPATCH@
---- sql-ledger-2.2.6.orig/bin/Makefile
-+++ sql-ledger-2.2.6/bin/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/bin/Makefile
 @@ -0,0 +1,18 @@
 +PACKAGE = sql-ledger
 +
@@ -43,8 +23,8 @@ exit 0
 +	for module in $(MODULES) ; do \
 +	  (cd bin/lynx ; ln -f ../mozilla/$$module) ;\
 +	done ;
---- sql-ledger-2.2.6.orig/doc/Makefile
-+++ sql-ledger-2.2.6/doc/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/doc/Makefile
 @@ -0,0 +1,13 @@
 +PACKAGE = sql-ledger
 +
@@ -59,8 +39,8 @@ exit 0
 +	cp -a $(FILES) $(DESTDIR)/usr/share/doc/sql-ledger
 +	
 +#for ALL in locale/*/COPYING ; do HEAD=$(grep -n "# This program is free software" $ALL |cut -f1 -d:); let HEAD=$HEAD-1; head -$HEAD $ALL | tail +4 ; done | grep -v "^#$"
---- sql-ledger-2.2.6.orig/sql/Makefile
-+++ sql-ledger-2.2.6/sql/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/sql/Makefile
 @@ -0,0 +1,11 @@
 +PACKAGE = sql-ledger
 +
@@ -73,8 +53,8 @@ exit 0
 +install: 
 +	mkdir -p $(DESTDIR)/usr/share/sql-ledger/sql
 +	cp $(FILES) $(DESTDIR)/usr/share/sql-ledger/sql
---- sql-ledger-2.2.6.orig/templates/Makefile
-+++ sql-ledger-2.2.6/templates/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/templates/Makefile
 @@ -0,0 +1,14 @@
 +PACKAGE = sql-ledger
 +
@@ -90,8 +70,8 @@ exit 0
 +	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/templates
 +	ln -sf /var/lib/sql-ledger/templates $(DESTDIR)/usr/share/sql-ledger/
 +	
---- sql-ledger-2.2.6.orig/css/Makefile
-+++ sql-ledger-2.2.6/css/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/css/Makefile
 @@ -0,0 +1,13 @@
 +PACKAGE = sql-ledger
 +
@@ -106,8 +86,8 @@ exit 0
 +	cp $(FILES) $(DESTDIR)/var/lib/sql-ledger/css
 +	chown -R www-data:www-data $(DESTDIR)/var/lib/sql-ledger/css
 +	ln -sf /var/lib/sql-ledger/css $(DESTDIR)/usr/share/sql-ledger/
---- sql-ledger-2.2.6.orig/users/Makefile
-+++ sql-ledger-2.2.6/users/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/users/Makefile
 @@ -0,0 +1,13 @@
 +PACKAGE = sql-ledger
 +
@@ -122,8 +102,8 @@ exit 0
 +	cp -r $(FILES) $(DESTDIR)/var/lib/sql-ledger/users/
 +	chown www-data:www-data $(DESTDIR)/var/lib/sql-ledger/users
 +	ln -sf /var/lib/sql-ledger/users $(DESTDIR)/usr/share/sql-ledger/
---- sql-ledger-2.2.6.orig/SL/Makefile
-+++ sql-ledger-2.2.6/SL/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/SL/Makefile
 @@ -0,0 +1,11 @@
 +PACKAGE = sql-ledger
 +
@@ -136,8 +116,8 @@ exit 0
 +install:
 +	mkdir -p $(DESTDIR)/usr/share/sql-ledger/SL
 +	cp -r $(FILES) $(DESTDIR)/usr/share/sql-ledger/SL
---- sql-ledger-2.2.6.orig/locale/Makefile
-+++ sql-ledger-2.2.6/locale/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/locale/Makefile
 @@ -0,0 +1,43 @@
 +PACKAGE = sql-ledger
 +
@@ -182,8 +162,8 @@ exit 0
 +	   perl -I $(srctopdir) ./locales.pl || exit 1) ; \
 +	done
 +
---- sql-ledger-2.2.6.orig/Makefile
-+++ sql-ledger-2.2.6/Makefile
+--- /dev/null
++++ sql-ledger-2.8.15/Makefile
 @@ -0,0 +1,36 @@
 +PACKAGE = sql-ledger
 +
@@ -221,8 +201,8 @@ exit 0
 +	cp $(CFG_FILES) $(DESTDIR)/etc/sql-ledger
 +
 +clean:
---- sql-ledger-2.2.6.orig/sql-ledger-httpd.conf
-+++ sql-ledger-2.2.6/sql-ledger-httpd.conf
+--- /dev/null
++++ sql-ledger-2.8.15/sql-ledger-httpd.conf
 @@ -0,0 +1,8 @@
 +
 +

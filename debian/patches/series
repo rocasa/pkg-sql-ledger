@@ -1,6 +1,3 @@
-#
 # List of patches to apply.
-#
-05improve-sec-check
 10makefiles
 45crosslink

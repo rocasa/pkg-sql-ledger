@@ -1,0 +1,25 @@
+Description: Add links between the normal login page and the admin login
+ page.
+Forwarded-Upsteam: tried on 2004-08-07 but Dieter refused as he prefers to
+ "hide" the admin login page from users.
+
+--- sql-ledger-2.8.15.orig/bin/mozilla/admin.pl
++++ sql-ledger-2.8.15/bin/mozilla/admin.pl
+@@ -104,6 +104,7 @@ function sf(){
+ <input type=hidden name=action value=login>
+ <input type=hidden name=path value=$form->{path}>
+ </table>
++<p><a href="login.pl">Normal login</a></p>
+ 
+ </form>
+ 
+--- sql-ledger-2.8.15.orig/bin/mozilla/login.pl
++++ sql-ledger-2.8.15/bin/mozilla/login.pl
+@@ -130,6 +130,7 @@ $sf
+     </td>
+   </tr>
+ </table>
++<p><a href="admin.pl">Administration login</a></p>
+   
+ </body>
+ </html>
