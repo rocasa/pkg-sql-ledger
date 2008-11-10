@@ -1,3 +1,11 @@
+sql-ledger (2.8.18-1) unstable; urgency=low
+
+  * New upstream release. It contains again more fixes for perl 5.10. 
+  * Drop useless prerm and add missing "set -e" in postinst.
+  * s/latex/LaTeX/ in the package's description.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Mon, 10 Nov 2008 13:47:19 +0100
+
 sql-ledger (2.8.16-1) unstable; urgency=low
 
   * New uptream release. It contains more fixes for perl 5.10.

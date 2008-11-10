@@ -29,7 +29,7 @@ Description: A web based double-entry accounting program
  Invoices, Packing List, Income Statement, Balance Sheet, Sales and
  Purchase Order, Statements, Receipts and Checks are generated from
  templates and may be changed to suit your needs. Templates are provided
- in html and tex format. The tex templates are processed with latex
+ in html and tex format. The tex templates are processed with LaTeX
  to produce postscript and PDF documents and can be sent to a printer,
  displayed in a PDF viewer or sent out via email ...
  .
