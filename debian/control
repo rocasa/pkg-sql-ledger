@@ -11,7 +11,7 @@ Standards-Version: 3.8.0
 
 Package: sql-ledger
 Architecture: all
-Depends: ${perl:Depends}, apache2 | httpd, libdbd-pg-perl
+Depends: ${perl:Depends}, apache2 | httpd, libdbd-pg-perl, ${misc:Depends}
 Suggests: texlive-latex-extra | tetex-extra, postgresql
 Description: A web based double-entry accounting program
  Accounting data is stored in an SQL Server, for the display any text or

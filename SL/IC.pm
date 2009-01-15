@@ -660,12 +660,11 @@ sub retrieve_assemblies {
 sub restock_assemblies {
   my ($self, $myconfig, $form, $dbh) = @_;
 
-  my $disconnect;
+  my $disconnect = ($dbh) ? 0 : 1;
   
   # connect to database
   if (!$dbh) {
     $dbh = $form->dbconnect_noauto($myconfig);
-    $disconnect = 1;
   }
    
   for my $i (1 .. $form->{rowcount}) {
@@ -1727,7 +1726,7 @@ sub create_links {
                   l.description AS translation
                   FROM chart c
 		  LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
-		  WHERE c.id = $defaults{"${_}_accno_id"}|;
+		  WHERE c.id = '$defaults{"${_}_accno_id"}'|;
       ($form->{"${_}_accno"}, $form->{"${_}_description"}, $form->{"${_}_translation"}) = $dbh->selectrow_array($query);
       $form->{"${_}_description"} = $form->{"${_}_translation"} if $form->{"${_}_translation"};
       $form->{amount}{"IC_$_"} = { accno => $form->{"${_}_accno"}, description => $form->{"${_}_description"} };

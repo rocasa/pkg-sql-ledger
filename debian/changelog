@@ -1,3 +1,22 @@
+sql-ledger (2.8.20-1) unstable; urgency=low
+
+  * New upstream release.
+    From 2.8.20:
+    - fixed "database handle destroyed" error when printing 
+    From 2.8.19:
+    - added missing localization strings for batch printing module
+    - added query to unlock orders when invoice is removed
+    - added option to generate detailed purchase orders from sales orders
+    - cross-reference consolidated orders; recall original order
+      shipping address selection; select from previous addresses or enter a new
+      address
+    - added missing lineitem details on ship/receive screen
+    - changed template parser to allow for multiple spaces and inline if
+      statements 
+  * Add ${misc:Depends} to the Depends field.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Thu, 15 Jan 2009 10:46:03 +0100
+
 sql-ledger (2.8.18-1) unstable; urgency=low
 
   * New upstream release. It contains again more fixes for perl 5.10. 
