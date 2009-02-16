@@ -1089,7 +1089,7 @@ sub all_parts {
 		    i.trans_id, ct.name, e.name AS employee,
 		    a.curr, a.till, p.notes, p.toolnumber,
 		    p.countryorigin, p.tariff_hscode, p.barcode
-		    $makemodelfld|;
+		    $makemodelflds|;
 
 
       if ($form->{bought}) {
@@ -1164,7 +1164,7 @@ sub all_parts {
 		 i.trans_id, ct.name, e.name AS employee,
 		 a.curr, '0' AS till, p.notes, p.toolnumber,
 		 p.countryorigin, p.tariff_hscode, p.barcode
-		 $makemodelfld|;
+		 $makemodelflds|;
 
       if ($form->{ordered}) {
 	$query .= qq|$union
@@ -1197,7 +1197,7 @@ sub all_parts {
 		   i.trans_id, ct.name, e.name AS employee,
 		   a.curr, '0' AS till, p.notes, p.toolnumber,
 		   p.countryorigin, p.tariff_hscode, p.barcode
-		   $makemodelfld|;
+		   $makemodelflds|;
 		   
 	$query .= qq|$union
 	            SELECT $flds, 'oe' AS module, 'purchase_order' AS type,
@@ -1248,7 +1248,7 @@ sub all_parts {
 		 i.trans_id, ct.name, e.name AS employee,
 		 a.curr, '0' AS till, p.notes, p.toolnumber,
 		 p.countryorigin, p.tariff_hscode, p.barcode
-		 $makemodelfld|;
+		 $makemodelflds|;
 
       if ($form->{quoted}) {
 	$query .= qq|$union
@@ -1281,7 +1281,7 @@ sub all_parts {
 		   i.trans_id, ct.name, e.name AS employee,
 		   a.curr, '0' AS till, p.notes, p.toolnumber,
 		   p.countryorigin, p.tariff_hscode, p.barcode
-		   $makemodelfld|;
+		   $makemodelflds|;
 
 	$query .= qq|$union
 	            SELECT $flds, 'oe' AS module, 'request_quotation' AS type,

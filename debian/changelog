@@ -1,3 +1,18 @@
+sql-ledger (2.8.23-1) unstable; urgency=low
+
+  * New upstream release:
+    From 2.8.23:
+    - corrected version number 
+    From 2.8.22:
+    - removed extra files not needed 
+    From 2.8.21:
+    - fixed formatting error for recurring transactions
+    - make/model is now included on parts reports with invoices
+    - added function to assign new number
+    - added variable to include proper shipping address for batch printing 
+
+ -- Raphael Hertzog <hertzog@debian.org>  Mon, 16 Feb 2009 23:30:58 +0100
+
 sql-ledger (2.8.20-1) unstable; urgency=low
 
   * New upstream release.
