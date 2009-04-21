@@ -1,3 +1,19 @@
+sql-ledger (2.8.24-1) unstable; urgency=low
+
+  * New upstream release:
+    - added reminders; keep track of level
+    - added customernumber variable for generating document control numbers
+    - additional option to calculate check digits according to modulo 10
+      and 11
+  * Add UTF-8 variants of most translations (auto-converted from the existing
+    ones).
+  * Add recode to Build-Depends since debian/create_utf8_locales.sh need it.
+  * Updated Standards-Version to 3.8.1 (no change required).
+  * Add patch debian/patches/50fixes-perl-5.10 to fix some errors triggered
+    only with perl 5.10. Closes: #503832
+
+ -- Raphael Hertzog <hertzog@debian.org>  Tue, 21 Apr 2009 08:47:47 +0200
+
 sql-ledger (2.8.23-1) unstable; urgency=low
 
   * New upstream release:

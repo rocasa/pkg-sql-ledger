@@ -14,7 +14,9 @@ install: build
 	sed -e 's|^\$$userspath = .*$$|$$userspath = "/var/lib/sql-ledger/users";|' \
 	    -e 's|^\$$memberfile = .*$$|$$memberfile = "/var/lib/sql-ledger/users/members";|' \
 	sql-ledger.conf.default > sql-ledger.conf
+	cd locale && sh ../debian/create_utf8_locales.sh
 	dh install
+	rm -f debian/sql-ledger/usr/share/sql-ledger/bin/mozilla/.rp.pl.swp
 
 # Build architecture-independent files here.
 binary-indep: install
