@@ -1,31 +1,16 @@
 #!/usr/bin/make -f
 
-include /usr/share/quilt/quilt.make
+%:
+	dh --with quilt $@
 
-build: patch
-	dh build
-
-clean: unpatch
-	dh clean
+override_dh_auto_clean:
+	dh_auto_clean
 	rm -f sql-ledger.conf
 
-install: build
-	# Add here commands to install the package into debian/sql-ledger.
+override_dh_auto_install:
 	sed -e 's|^\$$userspath = .*$$|$$userspath = "/var/lib/sql-ledger/users";|' \
 	    -e 's|^\$$memberfile = .*$$|$$memberfile = "/var/lib/sql-ledger/users/members";|' \
 	sql-ledger.conf.default > sql-ledger.conf
 	cd locale && sh ../debian/create_utf8_locales.sh
-	dh install
-	rm -f debian/sql-ledger/usr/share/sql-ledger/bin/mozilla/.rp.pl.swp
+	dh_auto_install
 
-# Build architecture-independent files here.
-binary-indep: install
-	dh binary-indep
-
-# Build architecture-dependent files here.
-binary-arch: install
-	dh binary-arch
-
-binary: binary-indep binary-arch
-
-.PHONY: build clean binary-indep binary-arch binary install

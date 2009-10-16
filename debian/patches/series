@@ -1,4 +1,3 @@
 # List of patches to apply.
 10makefiles
 45crosslink
-50fixes-perl-5.10

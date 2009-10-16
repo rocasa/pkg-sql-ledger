@@ -1,13 +1,13 @@
 Source: sql-ledger
 Section: web
 Priority: optional
-Maintainer: Raphael Hertzog <hertzog@debian.org>
+Maintainer: Raphaël Hertzog <hertzog@debian.org>
 Uploaders: Petter Reinholdtsen <pere@debian.org>, Gerardo Reynoso <greynoso@tindes.com>
-Build-Depends: debhelper (>= 7), quilt, recode
+Build-Depends: debhelper (>= 7.0.50~), quilt (>= 0.46-7~), recode
 Homepage: http://www.sql-ledger.com
 Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-sql-ledger/trunk/?op=log
-Standards-Version: 3.8.1
+Standards-Version: 3.8.3
 
 Package: sql-ledger
 Architecture: all
@@ -35,4 +35,5 @@ Description: A web based double-entry accounting program
  .
  NOTE: This package does not benefit from serious security support
  and you should use it only in a trusted environment. It's known
- to be affected by multiple SQL injections and similar problems.
+ to be affected by multiple SQL injections and similar problems. See
+ the README.Debian file for more information.

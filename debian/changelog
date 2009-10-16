@@ -1,3 +1,24 @@
+sql-ledger (2.8.25-1) unstable; urgency=low
+
+  * New upstream release:
+    - added customer and vendor import function
+    - added variables for remittance forms and reminder notices
+    - added companyemail and companywebsite variables. Closes: #440131
+    - fixed internal notes display for new transactions
+    - added modulo calculation for spoolfiles
+    - import payments with DCN for open and closed transactions
+    - added message handling for admin locks
+    - fixed emtpy line issue with template editor
+  * Updated Standards-Version to 3.8.3 (no changes required).
+  * Drop patch debian/patches/50fixes-perl-5.10 as it has been integrated
+    upstream.
+  * Fix my name in the Maintainer field.
+  * Simplify further the rules file with dh 7 overrides.
+  * Update the description to refer to README.Debian and enhance the
+    README.Debian.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Fri, 16 Oct 2009 10:06:36 +0200
+
 sql-ledger (2.8.24-1) unstable; urgency=low
 
   * New upstream release:

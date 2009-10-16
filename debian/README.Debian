@@ -20,6 +20,10 @@ http://bugs.debian.org/409703
 http://www.securityfocus.com/archive/1/459264
 http://www.securityfocus.com/archive/1/445817
 
+Furthermore, Debian doesn't offer official security support for this
+package given that the upstream developer almost never acknowledges
+security issues and doesn't provide the corresponding fixes.
+
 CONFIGURATION INFORMATION
 -------------------------
 
