@@ -3,7 +3,7 @@ Section: web
 Priority: optional
 Maintainer: Raphaël Hertzog <hertzog@debian.org>
 Uploaders: Petter Reinholdtsen <pere@debian.org>, Gerardo Reynoso <greynoso@tindes.com>
-Build-Depends: debhelper (>= 7.0.50~), quilt (>= 0.46-7~), recode
+Build-Depends: debhelper (>= 7.0.50~), recode
 Homepage: http://www.sql-ledger.com
 Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-sql-ledger/trunk/?op=log

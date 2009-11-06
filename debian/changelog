@@ -1,3 +1,13 @@
+sql-ledger (2.8.27-1) unstable; urgency=low
+
+  * New upstream release.
+    - fixed payment for recurring transactions
+    - fixed lineitem discount when converting order to invoice
+  * Switch to 3.0 (quilt) source format. Thus remove quilt
+    build-dependency and the --with quilt in debian/rules.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Fri, 06 Nov 2009 08:13:54 +0100
+
 sql-ledger (2.8.26-1) unstable; urgency=low
 
   * New upstream release. 
