@@ -1,0 +1,9 @@
+Document: sql-ledger-faq
+Title: SQL Legder FAQ
+Abstract: Frequently Asked Questions about SQL Ledger, a web based
+ double-entry accounting program.
+Section: Office
+
+Format: HTML
+Index: /usr/share/doc/sql-ledger/faq.html
+Files: /usr/share/doc/sql-ledger/faq.html

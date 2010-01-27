@@ -1,4 +1,4 @@
-sql-ledger (2.6.28-1) unstable; urgency=low
+sql-ledger (2.8.14-1) unstable; urgency=low
 
   The package doesn't do any web-server configuration any more. If you want
   to activate SQL-Ledger, just add a line 

@@ -1,3 +1,11 @@
+sql-ledger (2.8.28-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fix version indicated in debian/NEWS (thanks to lintian).
+  * Register documentation with doc-base.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Wed, 27 Jan 2010 18:57:26 +0100
+
 sql-ledger (2.8.27-1) unstable; urgency=low
 
   * New upstream release.
