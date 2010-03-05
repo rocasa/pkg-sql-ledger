@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 7.0.50~), recode
 Homepage: http://www.sql-ledger.com
 Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-sql-ledger/trunk/?op=log
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 
 Package: sql-ledger
 Architecture: all
