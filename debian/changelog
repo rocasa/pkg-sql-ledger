@@ -1,3 +1,12 @@
+sql-ledger (2.8.32-1) unstable; urgency=low
+
+  * New upstream release. 
+    - fixed SQL injection
+    - fixed date paid formatting
+    - updated Dutch translation 
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Nov 2010 00:08:46 +0100
+
 sql-ledger (2.8.31-1) unstable; urgency=low
 
   * New upstream release.
