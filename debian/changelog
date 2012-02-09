@@ -1,3 +1,12 @@
+sql-ledger (2.8.36-1) unstable; urgency=low
+
+  * New upstream release. 
+  * Use debhelper compatibility level 9.
+  * Update description to drop leading article (lintian warning).
+  * Updated Standards-Version to 3.9.2.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Thu, 09 Feb 2012 11:48:03 +0100
+
 sql-ledger (2.8.33-1) unstable; urgency=low
 
   * New upstream release.

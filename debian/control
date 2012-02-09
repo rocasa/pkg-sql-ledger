@@ -2,17 +2,17 @@ Source: sql-ledger
 Section: web
 Priority: optional
 Maintainer: Raphaël Hertzog <hertzog@debian.org>
-Build-Depends: debhelper (>= 7.0.50~), recode
+Build-Depends: debhelper (>= 9), recode
 Homepage: http://www.sql-ledger.com
 Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-sql-ledger/trunk/?op=log
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 
 Package: sql-ledger
 Architecture: all
 Depends: ${perl:Depends}, apache2 | httpd, libdbd-pg-perl, ${misc:Depends}
 Suggests: texlive-latex-extra, postgresql
-Description: A web based double-entry accounting program
+Description: Web based double-entry accounting program
  Accounting data is stored in an SQL Server, for the display any text or
  GUI browser can be used. The entire system is linked through a chart
  of accounts. Each item in inventory is linked to revenue, expense,
