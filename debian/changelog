@@ -1,3 +1,15 @@
+sql-ledger (3.0.0-2) unstable; urgency=low
+
+  * Fix typo in debian/NEWS.
+  * New patch to allow changing pdflatex/latex command lines via
+    $exec_latex and $exec_pdflatex config variables.
+  * Drop postinst code that resets ownership to www-data. The .deb has
+    correct information now.
+  * Rename debian/postinst in debian/sql-ledger.postinst.
+  * Drop useless debian/dirs.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 03 Apr 2012 22:07:15 +0200
+
 sql-ledger (3.0.0-1) unstable; urgency=low
 
   * New upstream release.

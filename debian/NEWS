@@ -1,8 +1,8 @@
 sql-ledger (3.0.0-1) unstable; urgency=low
 
   When upgrading to this version, you have to update some
-  files and directory structure anually. Please follow instructions given in
-  /usr/share/doc/sql-ledger/UPGRADE.gz.
+  files and directory structure manually. Please follow the instructions given
+  in /usr/share/doc/sql-ledger/UPGRADE.gz.
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 03 Apr 2012 15:39:20 +0200
 
