@@ -3,14 +3,31 @@
 %:
 	dh $@
 
-override_dh_auto_clean:
-	dh_auto_clean
-	rm -f sql-ledger.conf
-
-override_dh_auto_install:
+override_dh_auto_build:
+	# Generate default configuration file
 	sed -e 's|^\$$userspath = .*$$|$$userspath = "/var/lib/sql-ledger/users";|' \
 	    -e 's|^\$$memberfile = .*$$|$$memberfile = "/var/lib/sql-ledger/users/members";|' \
+	    -e 's|^#$$latex = .*$$|$$latex = 1;|' \
 	sql-ledger.conf.default > sql-ledger.conf
+	# Build missing UTF-8 locale files
 	cd locale && sh ../debian/create_utf8_locales.sh
-	dh_auto_install
 
+override_dh_auto_clean:
+	rm -f sql-ledger.conf
+	if [ -e locale/generated ]; then \
+	     cd locale; \
+	     rm -f $(cat locale/generated 2>/dev/null); \
+	fi
+
+override_dh_auto_install:
+	# No build system
+
+override_dh_install:
+	dh_install
+	# Drop unwanted license files
+	find debian/sql-ledger/usr/share/sql-ledger -name COPYING -print0 | xargs -0 rm -f
+
+override_dh_fixperms:
+	dh_fixperms
+	# Ensure webserver has the right on various files that must be editable
+	chown -R www-data:www-data debian/sql-ledger/var/lib/sql-ledger/*

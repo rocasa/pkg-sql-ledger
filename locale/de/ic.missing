@@ -1,0 +1,16 @@
+# module ic
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'Barcodes'                    => '',
+  'Inventory Valuation'         => '',
+  'New Number'                  => '',
+  'Nothing to print'            => '',
+  'Parts Report'                => '',
+  'Preview'                     => '',
+  'Print '                      => '',
+  'Report processed!'           => '',
+  'XML'                         => '',
+};
+
+1;

@@ -1,4 +1,0 @@
-# Lintian bug #348978
-# IMHO Hardlinks inside /usr/{lib,share}/<package> are not a problem
-sql-ledger binary: package-contains-hardlink
-

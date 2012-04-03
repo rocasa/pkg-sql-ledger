@@ -1,0 +1,9 @@
+# module admin
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'Login Name'                  => '',
+  'logout'                      => '',
+};
+
+1;

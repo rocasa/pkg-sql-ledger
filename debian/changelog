@@ -1,3 +1,14 @@
+sql-ledger (3.0.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Updated Standards-Version to 3.9.3.
+  * Add a note in debian/NEWS explaining that upgrading requires manual
+    work.
+  * Use debian/rules and debhelper to install everything instead of
+    patched-in makefile. Thus drop debian/patches/10makefiles.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 03 Apr 2012 18:42:02 +0200
+
 sql-ledger (2.8.36-1) unstable; urgency=low
 
   * New upstream release. 

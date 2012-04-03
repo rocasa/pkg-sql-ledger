@@ -1,0 +1,41 @@
+# module ps
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'Add Column'                  => '',
+  'Align'                       => '',
+  'Assign Number'               => '',
+  'Delete Column'               => '',
+  'Delete Report'               => '',
+  'Edit Column'                 => '',
+  'Edit Column Header'          => '',
+  'Edit Column Total'           => '',
+  'Fill'                        => '',
+  'Fixed value'                 => '',
+  'Generate Invoices'           => '',
+  'Generate Sales Invoices'     => '',
+  'Generating Invoices'         => '',
+  'Left'                        => '',
+  'Main Groups'                 => '',
+  'New Number'                  => '',
+  'Open Drawer'                 => '',
+  'Open drawer command failed!' => '',
+  'Open drawer command not defined!' => '',
+  'Poledisplay'                 => '',
+  'Preview'                     => '',
+  'Private'                     => '',
+  'Report'                      => '',
+  'Right'                       => '',
+  'Save Column'                 => '',
+  'Save Report'                 => '',
+  'Save Report as new'          => '',
+  'Statement 1'                 => '',
+  'Statement 2'                 => '',
+  'Statement 3'                 => '',
+  'Unknown Error!'              => '',
+  'Width'                       => '',
+  'XML'                         => '',
+  'failed!'                     => '',
+};
+
+1;

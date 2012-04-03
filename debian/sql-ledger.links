@@ -1,1 +1,6 @@
+etc/sql-ledger/sql-ledger.conf usr/share/sql-ledger/sql-ledger.conf
 usr/share/sql-ledger usr/lib/sql-ledger
+var/lib/sql-ledger/templates usr/share/sql-ledger/templates
+var/lib/sql-ledger/spool usr/share/sql-ledger/spool
+var/lib/sql-ledger/users usr/share/sql-ledger/users
+var/lib/sql-ledger/css usr/share/sql-ledger/css

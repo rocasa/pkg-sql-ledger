@@ -1,0 +1,10 @@
+# module ct
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'BC Number'                   => '',
+  'Member Number'               => '',
+  'New Number'                  => '',
+};
+
+1;

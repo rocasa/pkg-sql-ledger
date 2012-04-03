@@ -1,0 +1,20 @@
+# Standard sql-ledger files
+sql-ledger.conf.default usr/share/sql-ledger/
+*.pl usr/share/sql-ledger/
+*.html usr/share/sql-ledger/
+*.ini usr/share/sql-ledger/
+*.ico usr/share/sql-ledger/
+VERSION usr/share/sql-ledger/
+bin usr/share/sql-ledger/
+SL usr/share/sql-ledger/
+sql usr/share/sql-ledger/
+images usr/share/sql-ledger/
+locale usr/share/sql-ledger/
+# Directories offloaded to /var/lib/sql-ledger and writable by www-data
+templates var/lib/sql-ledger/
+users var/lib/sql-ledger/
+spool var/lib/sql-ledger/
+css var/lib/sql-ledger/
+# Configuration files
+*.conf etc/sql-ledger/
+debian/sql-ledger-httpd.conf etc/sql-ledger/

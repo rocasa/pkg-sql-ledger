@@ -17,6 +17,7 @@ for locale in $locales; do
     # Copy the directory over, and then convert it
     rm -rf "${locale}_utf"
     cp -a $locale "${locale}_utf"
+    echo "${locale}_utf" >>generated
     orig_charset=$(perl -ne "print \$1 if (/\((.*)\)/);" $locale/LANGUAGE)
     if [ -z "$orig_charset" ]; then
 	echo "Warning: $locale/LANGUAGE doesn't specify charset, assume ISO-8859-1" >&2
