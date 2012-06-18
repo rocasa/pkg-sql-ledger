@@ -1,3 +1,10 @@
+sql-ledger (3.0.3-1) unstable; urgency=low
+
+  * New Upstream release.
+  * Works with newer PostgreSQL servers. Closes: #677950
+
+ -- Nikolai Lusan <nikolai@lusan.id.au>  Mon, 18 Jun 2012 16:20:34 +1000
+
 sql-ledger (3.0.0-2) unstable; urgency=low
 
   * Fix typo in debian/NEWS.
