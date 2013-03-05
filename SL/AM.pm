@@ -1631,7 +1631,7 @@ sub backup {
   
   print OUT qq|-- SQL-Ledger Backup
 -- Dataset: $myconfig->{dbname}
--- Version: $form->{version}
+-- Version: $form->{dbversion}
 -- Host: $myconfig->{dbhost}
 -- Login: $form->{login}
 -- User: $myconfig->{name}
@@ -2244,7 +2244,7 @@ sub save_exchangerate {
 }
 
 
-sub remove_semaphores {
+sub remove_locks {
   my ($self, $myconfig, $form, $userspath) = @_;
   
   my $dbh = $form->dbconnect($myconfig);
@@ -2542,7 +2542,9 @@ sub move {
   my $dbh = $form->dbconnect($myconfig);
   
   my $id;
-  
+
+  for (qw(db fld id)) { $form->{$_} =~ s/;//g }
+
   my $query = qq|SELECT rn FROM $form->{db}
                  WHERE $form->{fld} = '$form->{id}'|;
   my ($rn) = $dbh->selectrow_array($query);

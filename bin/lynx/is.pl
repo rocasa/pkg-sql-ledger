@@ -905,8 +905,6 @@ sub form_footer {
 
   for $i (1 .. $form->{paidaccounts}) {
 
-    $form->{"paid_$i"} = $form->parse_amount(\%myconfig, $form->{"paid_$i"});
-
     print "
         <tr>\n";
 
@@ -1191,7 +1189,7 @@ sub update {
 
     if ($form->{rebuildpartsgroup}) {
      ######### pos
-     $form->{lookup} = $locale->text('Main Groups');
+     $form->{lookup} = "";
       for (@{ $form->{all_partsgroup} }) {
 	if ($_->{pos}) {
 	  $form->{lookup} .= "\n$_->{partsgroup}--$_->{translation}--$_->{image}";
