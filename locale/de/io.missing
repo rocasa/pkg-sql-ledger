@@ -1,0 +1,8 @@
+# module io
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'XML'                         => '',
+};
+
+1;

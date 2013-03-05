@@ -1,0 +1,26 @@
+# module gl
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'Add Column'                  => '',
+  'Align'                       => '',
+  'Delete Column'               => '',
+  'Delete Report'               => '',
+  'Edit Column'                 => '',
+  'Edit Column Header'          => '',
+  'Edit Column Total'           => '',
+  'Fill'                        => '',
+  'Fixed value'                 => '',
+  'Left'                        => '',
+  'New Number'                  => '',
+  'Private'                     => '',
+  'Report'                      => '',
+  'Right'                       => '',
+  'Save Column'                 => '',
+  'Save Report'                 => '',
+  'Save Report as new'          => '',
+  'Width'                       => '',
+  'XML'                         => '',
+};
+
+1;

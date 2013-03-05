@@ -1,0 +1,34 @@
+# module am
+# add the missing texts and run locales.pl to rebuild
+
+$missing = {
+  'AP Expense'                  => '',
+  'AP Payment'                  => '',
+  'AR Income'                   => '',
+  'AR Payment'                  => '',
+  'Cash Drawer'                 => '',
+  'Cash Over/Short'             => '',
+  'Clearing No.'                => '',
+  'Command'                     => '',
+  'Default'                     => '',
+  'Drop-down'                   => '',
+  'Early Payment Discount given' => '',
+  'Early Payment Discount received' => '',
+  'Exchangerate'                => '',
+  'Failed to save workstations!' => '',
+  'Non-tracking Item Expense'   => '',
+  'Non-tracking Item Income'    => '',
+  'Non-tracking Item Tax'       => '',
+  'On'                          => '',
+  'Pole Display'                => '',
+  'Round'                       => '',
+  'Tracking Item Income'        => '',
+  'Tracking Item Tax'           => '',
+  'Type of Contact'             => '',
+  'Workstation'                 => '',
+  'Workstations'                => '',
+  'Workstations saved!'         => '',
+  'XML'                         => '',
+};
+
+1;
