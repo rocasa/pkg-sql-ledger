@@ -1,0 +1,15 @@
+$self{charset} = 'UTF-8';
+
+$self{texts} = {
+  'Continue'                    => '繼續',
+  'Password'                    => '密碼',
+  'Session expired!'            => '會話過期',
+};
+
+$self{subs} = {
+  'getpassword'                 => 'getpassword',
+  '繼續'                      => 'continue',
+};
+
+1;
+
