@@ -850,11 +850,13 @@ sub get_name {
   $sth->execute || $form->dberror($query);
 
   $form->{taxaccounts} = "";
+  my %a = ();
   while ($ref = $sth->fetchrow_hashref(NAME_lc)) {
     if ($tax{$ref->{accno}}) {
-      if (not exists $form->{"$ref->{accno}_rate"}) {
+      if (not exists $a{$ref->{accno}}) {
 	for (qw(rate description taxnumber)) { $form->{"$ref->{accno}_$_"} = $ref->{$_} }
 	$form->{taxaccounts} .= "$ref->{accno} ";
+	$a{$ref->{accno}} = 1;
       }
     }
   }
