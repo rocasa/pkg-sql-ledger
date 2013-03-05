@@ -1543,7 +1543,7 @@ sub requirements {
   $sth->execute || $form->dberror($query);
 
   while ($ref = $sth->fetchrow_hashref(NAME_lc)) {
-    &requirements_assembly($dbh, $form, \%parts, $ref->{id}, $ref->{qty}, $where);
+    &requirements_assembly($dbh, $form, \%parts, $ref->{id}, $ref->{qty}, $where) if $ref->{qty};
   }
   $sth->finish;
 

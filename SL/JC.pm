@@ -203,8 +203,14 @@ sub jcparts {
   my ($self, $myconfig, $form, $dbh) = @_;
   
   my ($null, $project_id) = split /--/, $form->{projectnumber};
+  $project_id *= 1;
+
+  my $query = qq|SELECT customer_id
+                 FROM project
+		 WHERE id = $project_id|;
+  my ($customer_id) = $dbh->selectrow_array($query);
+  $customer_id *= 1;
   
-  my $query;
   my $where;
 
   if ($form->{project} eq 'job') {
@@ -256,7 +262,7 @@ sub jcparts {
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
 
-  my $pmh = price_matrix_query($dbh, $project_id * 1);
+  my $pmh = price_matrix_query($dbh, $project_id, $customer_id);
   IS::exchangerate_defaults($dbh, $form);
 
   while (my $ref = $sth->fetchrow_hashref(NAME_lc)) {
@@ -371,7 +377,7 @@ sub jcitems {
   ($form->{startdatefrom}, $form->{startdateto}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
   
   $where .= " AND j.checkedin >= '$form->{startdatefrom}'" if $form->{startdatefrom};
-  $where .= " AND j.checkedout <= date '$form->{startdateto}' + 1" if $form->{startdateto};
+  $where .= " AND j.checkedout < date '$form->{startdateto}' + 1" if $form->{startdateto};
 
   my %ordinal = ( id => 1,
                   description => 2,
@@ -538,7 +544,7 @@ sub save {
 
 
 sub price_matrix_query {
-  my ($dbh, $project_id) = @_;
+  my ($dbh, $project_id, $customer_id) = @_;
   
   my $query = qq|SELECT p.id AS parts_id, 0 AS customer_id, 0 AS pricegroup_id,
               0 AS pricebreak, p.sellprice, NULL AS validfrom, NULL AS validto,
@@ -552,9 +558,7 @@ sub price_matrix_query {
               FROM partscustomer p
 	      LEFT JOIN pricegroup g ON (g.id = p.pricegroup_id)
 	      WHERE p.parts_id = ?
-	      AND p.customer_id = (SELECT DISTINCT customer_id
-	                           FROM project
-				   WHERE id = $project_id)
+	      AND p.customer_id = $customer_id
 	      
 	      UNION
 
@@ -563,9 +567,7 @@ sub price_matrix_query {
 	      LEFT JOIN pricegroup g ON (g.id = p.pricegroup_id)
 	      JOIN customer c ON (c.pricegroup_id = g.id)
 	      WHERE p.parts_id = ?
-	      AND c.id = (SELECT DISTINCT customer_id
-	                           FROM project
-				   WHERE id = $project_id)
+	      AND c.id = $customer_id
 	      
 	      UNION
 
