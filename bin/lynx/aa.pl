@@ -131,7 +131,7 @@ sub create_links {
   $form->create_links($form->{ARAP}, \%myconfig, $form->{vc});
   $form->{readonly} ||= $readonly;
 
-  @a = qw(duedate taxincluded terms cashdiscount discountterms payment_accno payment_method);
+  @a = qw(duedate taxincluded terms cashdiscount discountterms payment_accno payment_method exchangerate);
   push @a, $form->{ARAP};
   for (@a) { $temp{$_} = $form->{$_} }
 
@@ -743,7 +743,7 @@ sub form_header {
 
     $form->{"calctax_$item"} = ($form->{"calctax_$item"}) ? "checked" : "";
 
-    $form->{"tax_$item"} = $form->format_amount(\%myconfig, $form->{"tax_$item"}, $form->{precision});
+    $form->{"tax_$item"} = $form->format_amount(\%myconfig, $form->{"tax_$item"}, $form->{precision}, 0);
 
     print qq|
         <tr>
