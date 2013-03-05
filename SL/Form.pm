@@ -56,10 +56,8 @@ sub new {
 
   $self->{menubar} = 1 if $self->{path} =~ /lynx/i;
 
-  $self->{version} = "2.6.5";
+  $self->{version} = "2.6.6";
   $self->{dbversion} = "2.6.4";
-
-  $self->{debug} = 1;
 
   bless $self, $type;
   
@@ -496,6 +494,8 @@ sub parse_template {
   my $subdir = "";
   my $err = "";
 
+  my $include = ();
+
   if ($self->{language_code}) {
     if (-f "$self->{templates}/$self->{language_code}/$self->{IN}") {
       open(IN, "$self->{templates}/$self->{language_code}/$self->{IN}") or $self->error("$self->{IN} : $!");
@@ -674,17 +674,17 @@ sub parse_template {
       $var =~ s/(\/|\.\.)//g;
 
       # prevent the infinite loop!
-      next if ($self->{"$var"});
+      next if ($include{$var});
 
-      unless (open(INC, "$self->{templates}/$var")) {
+      unless (open(INC, "$self->{templates}/$self->{language_code}/$var")) {
         $err = $!;
 	$self->cleanup;
-	$self->error("$self->{templates}/$var : $err");
+	$self->error("$self->{templates}/$self->{language_code}/$var : $err");
       }
       unshift(@_, <INC>);
       close(INC);
 
-      $self->{"$var"} = 1;
+      $include{$var} = 1;
 
       next;
     }
