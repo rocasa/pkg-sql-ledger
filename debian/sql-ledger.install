@@ -13,7 +13,6 @@ locale usr/share/sql-ledger/
 # Directories offloaded to /var/lib/sql-ledger and writable by www-data
 templates var/lib/sql-ledger/
 users var/lib/sql-ledger/
-spool var/lib/sql-ledger/
 css var/lib/sql-ledger/
 # Configuration files
 *.conf etc/sql-ledger/

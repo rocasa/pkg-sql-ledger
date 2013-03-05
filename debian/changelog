@@ -2,6 +2,8 @@ sql-ledger (3.0.4-1) unstable; urgency=low
 
   * New upstream release.
   * Update Vcs information (move to git in collab-maint).
+  * Create empty /var/lib/sql-ledger/spool instead of copying it over since
+    empty directories do not exist in git.
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 05 Mar 2013 13:28:40 +0100
 
