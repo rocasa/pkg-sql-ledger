@@ -5,9 +5,9 @@ Maintainer: Raphaël Hertzog <hertzog@debian.org>
 Uploaders: Nikolai Lusan <nikolai@lusan.id.au>
 Build-Depends: debhelper (>= 9), recode
 Homepage: http://www.sql-ledger.com
-Vcs-Svn: svn://svn.debian.org/pkg-sql-ledger/trunk
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-sql-ledger/trunk/?op=log
-Standards-Version: 3.9.3
+Vcs-Git: git://anonscm.debian.org/collab-maint/sql-ledger.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/sql-ledger.git
+Standards-Version: 3.9.4
 
 Package: sql-ledger
 Architecture: all
