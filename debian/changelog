@@ -1,3 +1,9 @@
+sql-ledger (3.0.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Sun, 28 Jul 2013 21:39:41 +0200
+
 sql-ledger (3.0.4-1) unstable; urgency=low
 
   * New upstream release.
