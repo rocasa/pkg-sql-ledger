@@ -1,3 +1,11 @@
+sql-ledger (3.0.5-2) UNRELEASED; urgency=medium
+
+  * Drop Nikolai Lusan from Uploaders on request of the MIA team.
+  * Orphan the package since I stopped using SQL-Ledger (in favor
+    of tryton).
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Sat, 07 Jun 2014 17:09:06 +0200
+
 sql-ledger (3.0.5-1) unstable; urgency=low
 
   * New upstream release.
