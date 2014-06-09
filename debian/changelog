@@ -1,3 +1,9 @@
+sql-ledger (3.0.6-2) unstable; urgency=medium
+
+  * Added myself to Maintainer field after adopting package. Closes: #750856
+
+ -- Nigel Kukard <nkukard@lbsd.net>  Mon, 07 Jul 2014 11:56:28 +0000
+
 sql-ledger (3.0.6-1) unstable; urgency=medium
 
   * Orphan the package since I stopped using SQL-Ledger (in favor
