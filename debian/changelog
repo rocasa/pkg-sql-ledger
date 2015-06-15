@@ -1,3 +1,23 @@
+sql-ledger (3.0.8-1) unstable; urgency=low
+
+  * New upstream release 3.0.8.
+    - fixed taxes for batch print function
+    - fixed taxes for multiple taxes with a valid to date
+    - changed printer string in check print module
+    - added missing balance sheet templates
+    - added missing variable for taxreports
+    - fixed division by zero error for credit invoices
+    - fixed check printing for multiple vendors
+    - added missing FROM clause in price matrix query
+  * New in 3.0.7
+    - added transaction locking for payroll
+    - added COGS difference for credit invoices
+    - fixed reconciliation to reconcile transactions with no source
+    - added fixed deduction for payroll
+    - fixed formatting for PDF parts report
+
+ -- Nigel Kukard <nkukard@lbsd.net>  Mon, 15 Jun 2015 09:57:54 +0000
+
 sql-ledger (3.0.6-2) unstable; urgency=medium
 
   * Added myself to Maintainer field after adopting package. Closes: #750856
