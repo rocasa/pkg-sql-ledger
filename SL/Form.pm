@@ -115,7 +115,7 @@ sub new {
 
   $self->{menubar} = 1 if $self->{path} =~ /lynx/i;
 
-  $self->{version} = "3.0.6";
+  $self->{version} = "3.0.8";
   $self->{dbversion} = "3.0.0";
 
   bless $self, $type;
@@ -554,6 +554,22 @@ sub sort_order {
   $sortorder = join ',', @sf;
 
   $sortorder;
+
+}
+
+
+sub ordinal_order {
+  my ($self, $dbh, $query) = @_;
+
+  return unless ($dbh && $query);
+  my %ordinal = ();
+
+  my $sth = $dbh->prepare($query);
+  $sth->execute || $self->dberror($query);
+  for (0 .. $sth->{NUM_OF_FIELDS} - 1) { $ordinal{$sth->{NAME_lc}->[$_]} = $_ + 1 }
+  $sth->finish;
+
+  %ordinal;
 
 }
 
@@ -1292,10 +1308,8 @@ sub gentex {
     $line = "";
     for (@{$column}) {
       $self->{temp} = $self->{$_}[$i];
-      if ($hdr->{$_}{type} eq 'n') {
-	$self->{temp} = $self->format_amount($myconfig, $self->{temp}, $hdr->{$_}{precision});
-      } else {
-	$self->format_string(temp);
+      if ($self->{temp} && $hdr->{$_}{type} ne 'n') {
+        $self->format_string(temp) unless $hdr->{$_}{image};
       }
       $line .= qq|$self->{temp} \& |;
     }
@@ -2287,7 +2301,7 @@ sub get_name {
                  FROM $table ct
 		 JOIN address ad ON (ad.trans_id = ct.id)
 		 WHERE $where
-		 ORDER BY $sortorder|;
+		 ORDER BY ct.$sortorder|;
 
   my $sth = $dbh->prepare($query);
 
@@ -2321,7 +2335,8 @@ sub get_currencies {
   my $curr;
   my $precision;
   
-  my $query = qq|SELECT curr, prec FROM curr
+  my $query = qq|SELECT curr, prec
+                 FROM curr
                  ORDER BY rn|;
   my $sth = $dbh->prepare($query);
   $sth->execute || $self->dberror($query);
@@ -2408,7 +2423,7 @@ sub all_vc {
 		UNION SELECT vc.id, vc.name
 		FROM $vc vc
 		WHERE vc.id = $self->{"${vc}_id"}
-		ORDER BY name|;
+		ORDER BY 2|;
     $sth = $dbh->prepare($query);
     $sth->execute || $self->dberror($query);
 
@@ -2495,7 +2510,7 @@ sub all_taxaccounts {
 		JOIN chart c ON (c.id = t.chart_id)
 		WHERE c.accno = ?
 		$where
-		ORDER BY accno, validto|;
+		ORDER BY c.accno, t.validto|;
     $sth = $dbh->prepare($query) || $self->dberror($query);
    
     foreach my $accno (split / /, $self->{taxaccounts}) {
@@ -2529,8 +2544,8 @@ sub all_employees {
     $query .= qq| AND sales = '1'|;
   }
 
-  $query .= qq|
-	         ORDER BY name|;
+  $query .= qq| ORDER BY name|;
+
   my $sth = $dbh->prepare($query);
   $sth->execute || $self->dberror($query);
 
@@ -2558,7 +2573,7 @@ sub all_projects {
 			 WHERE project_id > 0)| if ! $job;
 			 
   my $query = qq|SELECT *
-                 FROM project
+                 FROM project pr
 		 WHERE $where|;
 
   if ($form->{language_code}) {
@@ -2569,12 +2584,11 @@ sub all_projects {
   }
 
   if ($transdate) {
-    $query .= qq| AND (startdate IS NULL OR startdate <= '$transdate')
-                  AND (enddate IS NULL OR enddate >= '$transdate')|;
+    $query .= qq| AND (pr.startdate IS NULL OR pr.startdate <= '$transdate')
+                  AND (pr.enddate IS NULL OR pr.enddate >= '$transdate')|;
   }
 
-  $query .= qq|
-	         ORDER BY projectnumber|;
+  $query .= qq| ORDER BY pr.projectnumber|;
 
   $sth = $dbh->prepare($query);
   $sth->execute || $self->dberror($query);
@@ -3214,7 +3228,7 @@ sub get_partsgroup {
 
   if ($p->{all}) {
     $query = qq|SELECT *
-                FROM partsgroup|;
+                FROM partsgroup pg|;
     $where = "";
   }
 
@@ -3695,7 +3709,7 @@ sub save_intnotes {
 
 
 sub update_defaults {
-  my ($self, $myconfig, $fld, $dbh) = @_;
+  my ($self, $myconfig, $fld, $dbh, $ini) = @_;
 
   my $disconnect = ($dbh) ? 0 : 1;
   
@@ -3706,13 +3720,28 @@ sub update_defaults {
   my $query = qq|SELECT fldname FROM defaults
                    WHERE fldname = '$fld'|;
 
+  $ini =~ s/;.*//g;
+
   if (! $dbh->selectrow_array($query)) {
-    $query = qq|INSERT INTO defaults (fldname)
-                VALUES ('$fld')|;
+    if ($ini) {
+      $query = qq|INSERT INTO defaults (fldname, fldvalue)
+                  VALUES ('$fld', '$ini')|;
+    } else {
+      $query = qq|INSERT INTO defaults (fldname)
+                  VALUES ('$fld')|;
+    }
     $dbh->do($query) || $self->dberror($query);
     $dbh->commit;
+  } else {
+    if ($ini) {
+      $query = qq|UPDATE defaults SET
+                  fldvalue = '$ini'
+                  WHERE fldname = '$fld'|;
+      $dbh->do($query) || $self->dberror($query);
+      $dbh->commit;
+    }
   }
-  
+
   $query = qq|SELECT fldvalue FROM defaults
               WHERE fldname = '$fld' FOR UPDATE|;
   ($_) = $dbh->selectrow_array($query);
@@ -3762,7 +3791,7 @@ sub update_defaults {
       
       if ($param =~ /<%date%>/i) {
 	$str = ($self->split_date($myconfig->{dateformat}, $self->{transdate}))[0];
-	$var =~ s/$param/$str/;
+	$var =~ s/$param/$str/i;
       }
 
       if ($param =~ /<%(name|business|description|item|partsgroup|phone|custom)/i) {
@@ -3802,7 +3831,7 @@ sub update_defaults {
 	  my @p = ();
 
 	  my @date = $self->split_date($myconfig->{dateformat}, $self->{transdate});
-	  for (sort keys %d) { push @p, $date[$d{$_}] if ($p =~ /$_/) }
+	  for (sort keys %d) { push @p, $date[$d{$_}] if ($p =~ /$_/i) }
 	  $str = join $spc, @p;
 	}
 
@@ -3866,7 +3895,7 @@ sub reports {
   }
 
   $query .= qq|
-		 ORDER BY reportdescription|;
+		 ORDER BY r.reportdescription|;
   my $sth = $dbh->prepare($query);
   $sth->execute || $self->dberror($query);
 
@@ -3885,7 +3914,7 @@ sub reports {
               AND (r.login = '$login' OR r.login = '')|;
   }
   $query .= qq|
-	      ORDER BY reportid|;
+	      ORDER BY r.reportid|;
   $sth = $dbh->prepare($query);
   $sth->execute || $self->dberror($query);
 
@@ -4030,7 +4059,11 @@ sub save_report {
     $sth = $dbh->prepare($query);
 
     my %newform;
-    for (keys %$self) { $newform{$_} = $self->{$_} unless $_ =~ /ndx_\d+$/ }
+    for (keys %$self) {
+      if ($self->{$_} !~ /(HASH|ARRAY)/) {
+        $newform{$_} = $self->{$_} unless $_ =~ /ndx_\d+$/;
+      }
+    }
     for (qw(path login stylesheet dbversion report reportid reportcode reportdescription action script nextsub allbox charset timeout sessioncookie callback title titlebar version rowcount flds defaultcurrency selectlanguage savereport admin)) { delete $newform{$_} }
 
     for (keys %newform) {
@@ -4167,12 +4200,14 @@ sub split_date {
   my $mm;
   my $dd;
   my $yy;
+  my $yyyy;
   my $rv;
 
   if (! $date) {
     $dd = $t[3];
     $mm = ++$t[4];
     $yy = substr($t[5],-2);
+    $yyyy = substr($t[5]+1900,-4);
     $mm = substr("0$mm", -2);
     $dd = substr("0$dd", -2);
   }
@@ -4183,7 +4218,12 @@ sub split_date {
 	($yy, $mm, $dd) = split /\D/, $date;
 	$mm *= 1;
 	$dd *= 1;
-	$rv = "$yy$mm$dd";
+        $mm = substr("0$mm", -2);
+        $dd = substr("0$dd", -2);
+        $yyyy = substr($yy, -4);
+        $yy = substr($yy, -2);
+
+	$rv = "$yyyy$mm$dd";
       } else {
 	$rv = $date;
 	$date =~ /(....)(..)(..)/;
@@ -4195,7 +4235,7 @@ sub split_date {
       $dd = substr("0$dd", -2);
       $yy = substr($yy, -2);
     } else {
-      $rv = "$yy$mm$dd";
+      $rv = "$yyyy$mm$dd";
     }
   }
   
@@ -4207,13 +4247,14 @@ sub split_date {
 	$dd *= 1;
 	$mm = substr("0$mm", -2);
 	$dd = substr("0$dd", -2);
+	$yyyy = substr($yy, -4);
 	$yy = substr($yy, -2);
-	$rv = "$mm$dd$yy";
+	$rv = "$mm$dd$yyyy";
       } else {
 	$rv = $date;
       }
     } else {
-      $rv = "$mm$dd$yy";
+      $rv = "$mm$dd$yyyy";
     }
   }
   
@@ -4225,13 +4266,14 @@ sub split_date {
 	$dd *= 1;
 	$mm = substr("0$mm", -2);
 	$dd = substr("0$dd", -2);
+	$yyyy = substr($yy, -4);
 	$yy = substr($yy, -2);
-	$rv = "$dd$mm$yy";
+	$rv = "$dd$mm$yyyy";
       } else {
 	$rv = $date;
       }
     } else {
-      $rv = "$dd$mm$yy";
+      $rv = "$dd$mm$yyyy";
     }
   }
 

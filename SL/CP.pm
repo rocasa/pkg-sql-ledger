@@ -19,7 +19,7 @@ package CP;
 sub new {
   my ($type, $countrycode) = @_;
 
-  $self = {};
+  my $self = {};
 
   if ($countrycode) {
     if (-f "locale/$countrycode/Num2text") {
@@ -78,7 +78,7 @@ sub paymentaccounts {
 
   ($form->{employee}) = $form->get_employee($dbh);
   
-  my %defaults = $form->get_defaults($dbh, \@{['closedto']});
+  my %defaults = $form->get_defaults($dbh, \@{['closedto', "$form->{type}\_%"]});
   for (keys %defaults) { $form->{$_} = $defaults{$_} }
 
   $form->{currencies} = $form->get_currencies($dbh, $myconfig);
@@ -132,11 +132,10 @@ sub get_openvc {
 		 AND a.onhold = '0'
 		 AND NOT a.id IN (SELECT id
 		                  FROM semaphore)|;
-		 
+
+  $form->{vc} =~ s/;//g;
   my $arap = ($form->{vc} eq 'customer') ? 'ar' : 'ap';
 
-  my %defaults = $form->get_defaults($dbh, \@{['namesbynumber']});
-  
   my $sth;
   my $ref;
   my $i = 0;
@@ -151,7 +150,6 @@ sub get_openvc {
 	      AND a.duedate <= '$form->{duedateto}'|;
   }
 
-  my $accno;
   my $id;
   my $description;
   
@@ -188,6 +186,7 @@ sub get_openvc {
     }
   }
 
+  my %defaults = $form->get_defaults($dbh, \@{['namesbynumber']});
   my $sortorder = "name";
   if ($defaults{namesbynumber}) {
     $sortorder = "$form->{vc}number";
@@ -206,15 +205,13 @@ sub get_openvc {
 	      JOIN address ad ON (ad.trans_id = vc.id)
 	      LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
 	      WHERE $where
-	      ORDER BY $sortorder|;
+	      ORDER BY vc.$sortorder|;
   $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
 
   my %due;
   my @transactions = ();
 
-  ($accno) = split /--/, $form->{"$form->{ARAP}_paid"};
-  
   while ($ref = $sth->fetchrow_hashref(NAME_lc)) {
     
     $ref->{exchangerate} ||= 1;
@@ -244,7 +241,6 @@ sub get_openvc {
     push @{ $form->{name_list} }, $ref;
  
   }
-  
 
   $form->all_departments($myconfig, $dbh, $form->{vc});
   
@@ -260,16 +256,15 @@ sub get_openvc {
 sub retrieve {
   my ($self, $myconfig, $form) = @_;
   
-  my $null;
   my $id;
 
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
 
+  $form->{id} *= 1;
+
   my %defaults = $form->get_defaults($dbh, \@{['precision']});
   for (keys %defaults) { $form->{$_} = $defaults{$_} }
-    
-  my $sortorder = "transdate, invnumber";
 
   my $ml = 1;
   
@@ -301,8 +296,11 @@ sub retrieve {
                  GROUP BY a.id, a.invnumber, a.transdate, a.duedate,
 		 a.amount, a.paid, a.discountterms, a.cashdiscount, a.netamount,
 		 a.$form->{vc}_id, a.curr, ac.transdate, calcdiscount,
-		 ac.approved, exchangerate, ac.trans_id, ac.source, ac.memo
-		 ORDER BY $sortorder|;
+		 ac.approved, a.exchangerate, ac.trans_id, ac.source, ac.memo|;
+
+  my @sf = qw(transdate invnumber);
+  my %ordinal = $form->ordinal_order($dbh, $query);
+  $query .= qq| ORDER BY | .$form->sort_order(\@sf, \%ordinal);
 
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
@@ -394,7 +392,7 @@ sub retrieve {
   ($form->{batchdescription}, $form->{vouchernumber}) = $dbh->selectrow_array($query);
     
   $form->{voucherid} = $form->{id};
-  $form->{id} = "1";
+  $form->{id} *= 1;
   AA->get_name($myconfig, $form, $dbh);
 
   $form->{"old$form->{vc}"} = qq|$form->{$form->{vc}}--$form->{"$form->{vc}_id"}|;
@@ -413,11 +411,12 @@ sub retrieve {
 sub get_openinvoices {
   my ($self, $myconfig, $form) = @_;
   
-  my $null;
   my $id;
  
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
+
+  $form->{vc} =~ s/;//g;
  
   # remove locks
   $form->remove_locks($myconfig, $dbh, $form->{arap});
@@ -429,11 +428,11 @@ sub get_openinvoices {
 		 AND NOT a.id IN (SELECT id
 		                  FROM semaphore)|;
 
-  my $sortorder = "transdate, invnumber";
-
   my %defaults = $form->get_defaults($dbh, \@{[qw(namesbynumber cdt precision)]});
 
   for (keys %defaults) { $form->{$_} = $defaults{$_} }
+
+  my @sf = qw(transdate invnumber);
 
   if ($form->{payment} eq 'payments') {
     $where = qq|WHERE a.amount != a.paid
@@ -441,9 +440,9 @@ sub get_openinvoices {
 		AND a.onhold = '0'
 		AND NOT a.id IN (SELECT id
 		                 FROM semaphore)|;
-    $sortorder = "name, transdate";
+    @sf = qw(name transdate);
     if ($defaults{namesbynumber}) {
-      $sortorder = "$form->{vc}number, transdate";
+      @sf = ("$form->{vc}number", "transdate");
     }
   }
   
@@ -454,11 +453,11 @@ sub get_openinvoices {
   $where .= qq|
 	      AND a.duedate <= '$form->{duedateto}'| if $form->{duedateto};
 
-  ($null, $id) = split /--/, $form->{department};
+  (undef, $id) = split /--/, $form->{department};
   $where .= qq|
                  AND a.department_id = $id| if $id;
 
-  ($null, $id) = split /--/, $form->{paymentmethod};
+  (undef, $id) = split /--/, $form->{paymentmethod};
   $where .= qq|
                  AND a.paymentmethod_id = $id| if $id;
 	 
@@ -467,7 +466,7 @@ sub get_openinvoices {
 		 AND ch.accno = '$id'| if $id;
 
   if ($form->{vc} eq 'vendor') {
-    ($null, $id) = split /--/, $form->{business};
+    (undef, $id) = split /--/, $form->{business};
     $where .= qq|
 		   AND vc.business_id = $id| if $id;
 		   
@@ -489,8 +488,10 @@ sub get_openinvoices {
 		 JOIN $form->{vc} vc ON (vc.id = a.$form->{vc}_id)
 		 JOIN chart ch ON (ch.id = ac.chart_id)
 		 LEFT JOIN exchangerate ex ON (ex.curr = vc.curr AND ex.transdate = a.transdate)
-		 $where
-		 ORDER BY $sortorder|;
+		 $where|;
+
+  my %ordinal = $form->ordinal_order($dbh, $query);
+  $query .= qq| ORDER BY | .$form->sort_order(\@sf, \%ordinal);
 
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
@@ -565,6 +566,8 @@ sub post_payment {
     $form->{exchangerate} = 1;
   }
 
+  $form->update_defaults($myconfig, qq|$form->{type}_$paymentaccno|, $dbh, $form->{source});
+
   my $query;
   my $sth;
 
@@ -576,12 +579,15 @@ sub post_payment {
 	      WHERE c.link LIKE '%$form->{ARAP}_tax%'
 	      AND ac.trans_id = ?
 	      AND (t.validto >= ? OR t.validto IS NULL)
-	      ORDER BY validto DESC|;
+	      ORDER BY t.validto DESC|;
   my $tth = $dbh->prepare($query) || $form->dberror($query);
   
   my %defaults = $form->get_defaults($dbh, \@{['fx%_accno_id', 'cdt']});
 
-  my $ml;
+  my $ml = ($form->{ARAP} eq 'AR') ? 1 : -1;
+
+  $form->{arap} = lc $form->{ARAP};
+
   my $where;
   
   if ($form->{ARAP} eq 'AR') {
@@ -598,7 +604,13 @@ sub post_payment {
 		OR c.link LIKE '%:AP:%')
 		|;
   }
-  
+
+  # AR/AP default account
+  $query = qq|SELECT c.id
+              FROM chart c
+              WHERE $where|;
+  my ($arapdefault) = $dbh->selectrow_array($query);
+
   # AR/AP account
   $query = qq|SELECT DISTINCT c.id
               FROM chart c
@@ -608,7 +620,7 @@ sub post_payment {
   my $ath = $dbh->prepare($query) || $form->dberror($query);
 
   my $paymentamount = $form->parse_amount($myconfig, $form->{amount});
-  
+
   # query to retrieve paid amount
   $query = qq|SELECT amount, netamount, paid, transdate, taxincluded,
               exchangerate
@@ -631,6 +643,7 @@ sub post_payment {
   my $rate;
 
   # delete payments
+  $form->{voucherid} *= 1;
   if ($form->{edit} && $form->{voucherid}) {
     $query = qq|SELECT SUM(ac.amount) * $ml * -1
                 FROM acc_trans ac
@@ -732,7 +745,7 @@ sub post_payment {
  
   my $assignvoucherid;
   my $arap;
-  my ($null, $paymentmethod_id) = split /--/, $form->{paymentmethod};
+  my (undef, $paymentmethod_id) = split /--/, $form->{paymentmethod};
   $paymentmethod_id *= 1;
   
   # go through line by line
@@ -761,7 +774,7 @@ sub post_payment {
       $paymentamount -= $form->{"paid_$i"};
       
       $ath->execute($form->{"id_$i"}) || $form->dberror;
-      ($arap) = $ath->fetchrow_array;
+      ($arap) = $ath->fetchrow_array || $arapdefault;
       $ath->finish;
       
       $amount = $form->round_amount($form->{"paid_$i"} * $trans{$form->{"id_$i"}}{exchangerate}, $form->{precision});
@@ -987,6 +1000,10 @@ sub invoice_ids {
   my $dbh = $form->dbconnect($myconfig);
 
   my $datepaid = ($form->{datepaid}) ? "date '$form->{datepaid}'" : 'current_date';
+
+  $form->{vc} =~ s/;//g;
+  $form->{arap} = ($form->{vc} eq 'customer') ? 'ar' : 'ap';
+
   my $query = qq|SELECT DISTINCT a.id, a.invnumber, a.transdate, a.duedate,
                  a.description AS invdescription,
 		 a.amount, a.paid, vc.$form->{vc}number, vc.name,
