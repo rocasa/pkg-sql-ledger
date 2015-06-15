@@ -1,9 +1,0 @@
-# module aa
-# add the missing texts and run locales.pl to rebuild
-
-$missing = {
-  'New Number'                  => '',
-  'Preview'                     => '',
-};
-
-1;
