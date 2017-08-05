@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Robert James Clay <jame@rocasa.us> 
 Build-Depends: debhelper (>= 9), recode
 Homepage: http://www.sql-ledger.com
-Vcs-Git: git://anonscm.debian.org/collab-maint/sql-ledger.git
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/sql-ledger.git
 Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/sql-ledger.git
 Standards-Version: 3.9.6
 
