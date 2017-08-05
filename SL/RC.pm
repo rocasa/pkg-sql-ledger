@@ -25,6 +25,7 @@ sub paymentaccounts {
                  FROM chart c
 		 LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
 		 WHERE c.charttype = 'A'
+                 AND c.closed = '0'
 		 ORDER BY c.accno|;
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
@@ -52,7 +53,9 @@ sub payment_transactions {
                  WHERE accno = '$form->{accno}'|;
   ($form->{category}) = $dbh->selectrow_array($query);
 
-  ($form->{fromdate}, $form->{todate}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
+  unless ($form->{fromdate} || $form->{todate}) {
+    ($form->{fromdate}, $form->{todate}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
+  }
 
   my $cleared;
   if ($form->{todate}) {
@@ -132,10 +135,7 @@ sub payment_transactions {
   if ($form->{fx_transaction}) {
    
     $fx_transaction = qq|
-	      AND NOT
-		 (ac.chart_id = $defaults{fxgain_accno_id}
-		  OR ac.chart_id = $defaults{fxloss_accno_id}
-		 )|;
+	      AND NOT ac.chart_id = $defaults{fxgainloss_accno_id}|;
 		 
   } else {
     $fx_transaction = qq|

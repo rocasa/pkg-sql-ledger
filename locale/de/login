@@ -1,15 +1,13 @@
-$self{charset} = 'ISO-8859-1';
-
 $self{texts} = {
   'Company'                     => 'Firma',
   'Continue'                    => 'Weiter',
-  'Dataset is newer than version!' => 'Datensatz ist jünger als installierte Version',
-  'Incorrect Dataset version!'  => 'Ungültige Datensatzversion',
-  'Login'                       => 'Anmelden',
+  'Dataset is newer than version!' => 'Datenset ist neuer als installierte Version',
+  'Incorrect Dataset version!'  => 'UngÃ¼ltige Datenset-Version',
+  'Login'                       => 'Benutzername',
   'Name'                        => 'Name',
-  'No email address for'        => 'Keine eMailadresse für',
+  'No email address for'        => 'Keine E-Mailadresse fÃ¼r',
   'Password'                    => 'Passwort',
-  'Upgrading to Version'        => 'Datensatz wird erneuert auf Version',
+  'Upgrading to Version'        => 'Datenset wird erneuert auf Version',
   'Version'                     => 'Version',
   'You did not enter a name!'   => 'Sie haben keinen Namen eingegeben!',
 };
@@ -23,7 +21,7 @@ $self{subs} = {
   'selectdataset'               => 'selectdataset',
   'tan_login'                   => 'tan_login',
   'weiter'                      => 'continue',
-  'anmelden'                    => 'login',
+  'benutzername'                => 'login',
 };
 
 1;

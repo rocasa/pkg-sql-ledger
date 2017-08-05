@@ -1,13 +1,14 @@
 $self{texts} = {
   'Account'                     => 'Konto',
-  'Amount'                      => 'Beløp',
+  'Amount'                      => 'BelÃ¸p',
   'Continue'                    => 'Fortsett',
   'Date'                        => 'Dato',
   'Memo'                        => 'Notat',
-  'Nothing to print!'           => 'Ingenting å skrive ut!',
+  'Nothing to print!'           => 'Ingenting Ã¥ skrive ut!',
   'PDF'                         => 'PDF',
   'Postscript'                  => 'Postscript',
   'Screen'                      => 'Skjerm',
+  'Select postscript or PDF!'   => 'Velg postscript eller PDF!',
   'Source'                      => 'Bilag',
 };
 
@@ -19,7 +20,6 @@ $self{subs} = {
   'print_credit_note'           => 'print_credit_note',
   'print_debit_note'            => 'print_debit_note',
   'print_options'               => 'print_options',
-  'print_payslip'               => 'print_payslip',
   'print_receipt'               => 'print_receipt',
   'print_remittance_voucher'    => 'print_remittance_voucher',
   'print_transaction'           => 'print_transaction',

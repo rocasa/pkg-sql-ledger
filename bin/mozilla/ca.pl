@@ -1,6 +1,6 @@
 #=====================================================================
-# SQL-Ledger ERP
-# Copyright (C) 2006
+# SQL-Ledger
+# Copyright (c) DWS Systems Inc.
 #
 #  Author: DWS Systems Inc.
 #     Web: http://www.sql-ledger.com
@@ -13,6 +13,8 @@
 #======================================================================
 
 use SL::CA;
+require "$form->{path}/js.pl";
+
 
 1;
 # end of main
@@ -48,15 +50,18 @@ use SL::CA;
 
 sub chart_of_accounts {
 
+  $form->{excludeclosed} = 1;
+
   CA->all_accounts(\%myconfig, \%$form);
 
-  @column_index = qw(accno gifi_accno description debit credit);
+  @column_index = qw(accno gifi_accno description debit credit closed);
 
   $column_header{accno} = qq|<th class=listtop>|.$locale->text('Account').qq|</th>\n|;
   $column_header{gifi_accno} = qq|<th class=listtop>|.$locale->text('GIFI').qq|</th>\n|;
   $column_header{description} = qq|<th class=listtop>|.$locale->text('Description').qq|</th>\n|;
   $column_header{debit} = qq|<th class=listtop>|.$locale->text('Debit').qq|</th>\n|;
   $column_header{credit} = qq|<th class=listtop>|.$locale->text('Credit').qq|</th>\n|;
+  $column_header{closed} = qq|<th width=1% class=listtop>|.$locale->text('Closed').qq|</th>\n|;
   
   $form->helpref("coa", $myconfig{countrycode});
   
@@ -104,6 +109,7 @@ sub chart_of_accounts {
       
     $column_data{debit} = "<td align=right>".$form->format_amount(\%myconfig, $ca->{debit}, $form->{precision}, "&nbsp;")."</td>\n";
     $column_data{credit} = "<td align=right>".$form->format_amount(\%myconfig, $ca->{credit}, $form->{precision}, "&nbsp;")."</td>\n";
+    $column_data{closed} = ($ca->{closed}) ? "<td align=center>*</td>" : "<td></td>";
     
     $totaldebit += $ca->{debit};
     $totalcredit += $ca->{credit};
@@ -189,10 +195,12 @@ sub list {
   
   $form->header;
   
+  &calendar;
+ 
   print qq|
 <body>
 
-<form method=post action=$form->{script}>
+<form method="post" name="main" action="$form->{script}">
 |;
 
   $form->hide_form(qw(accno description accounttype gifi_accno gifi_description login path));
@@ -210,9 +218,8 @@ sub list {
         $department
 	<tr>
 	  <th align=right>|.$locale->text('From').qq|</th>
-	  <td><input name=fromdate size=11 class=date title="$myconfig{dateformat}"></td>
-	  <th align=right>|.$locale->text('To').qq|</th>
-	  <td><input name=todate size=11 class=date title="$myconfig{dateformat}"></td>
+	  <td><input name=fromdate size=11 class=date title="$myconfig{dateformat}">|.&js_calendar("main", "fromdate").qq|<b>|.$locale->text('To').qq|</b>
+	  <input name=todate size=11 class=date title="$myconfig{dateformat}">|.&js_calendar("main", "todate").qq|</td>
 	</tr>
 	$selectfrom
 	<tr>

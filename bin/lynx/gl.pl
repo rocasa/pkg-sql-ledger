@@ -1,6 +1,6 @@
 #=====================================================================
-# SQL-Ledger ERP
-# Copyright (c) 2006
+# SQL-Ledger
+# Copyright (c) DWS Systems Inc.
 #
 #  Author: DWS Systems Inc.
 #     Web: http://www.sql-ledger.com
@@ -132,6 +132,7 @@ sub edit {
   }
 
   $form->{rowcount} = $i;
+  $form->{oldtransdate} = $form->{transdate};
   $form->{focus} = "debit_$i";
 
   # readonly
@@ -174,20 +175,11 @@ sub create_links {
   }
 
   # departments
-  if (@{ $form->{all_department} }) {
-    $form->{department} = "$form->{department}--$form->{department_id}";
-    $form->{selectdepartment} = "\n";
-    for (@{ $form->{all_department} }) { $form->{selectdepartment} .= qq|$_->{description}--$_->{id}\n| }
-  }
+  $form->{department} = "$form->{department}--$form->{department_id}" if $form->{department_id};
+  &rebuild_departments;
 
-  # reference
-  $i = 0;
-  for (@{ $form->{all_reference} }) {
-    $i++;
-    $form->{"referencedescription_$i"} = $_->{description};
-    $form->{"referenceid_$i"} = $_->{id};
-  }
-  $form->{reference_rows} = $i;
+  # references
+  &all_references;
 
   for (qw(department projectnumber accno currency)) { $form->{"select$_"} = $form->escape($form->{"select$_"},1) }
   
@@ -304,12 +296,14 @@ sub search {
   
   $form->header;
 
-  JS->change_report(\%$form, \@input, \@checked, \%radio);
+  &calendar;
+  
+  &change_report(\%$form, \@input, \@checked, \%radio);
   
   print qq|
 <body>
 
-<form method=post action=$form->{script}>
+<form method="post" name="main" action="$form->{script}">
 
 <table width=100%>
   <tr>
@@ -361,7 +355,7 @@ sub search {
 
 	<tr>
 	  <th align=right>|.$locale->text('From').qq|</th>
-	  <td><input name=datefrom size=11 class=date title="$myconfig{dateformat}"> <b>|.$locale->text('To').qq|</b> <input name=dateto size=11 class=date title="$myconfig{dateformat}"></td>
+	  <td><input name=datefrom size=11 class=date title="$myconfig{dateformat}"> <b>|.&js_calendar("main", "datefrom").$locale->text('To').qq|</b> <input name=dateto size=11 class=date title="$myconfig{dateformat}">|.&js_calendar("main", "dateto").qq|</td>
 	</tr>
 	
 	$selectfrom
@@ -428,7 +422,7 @@ sub search {
 
   %button = ('Continue' => { ndx => 1, key => 'C', value => $locale->text('Continue') } );
   
-  for (sort { $button{$a}->{ndx} <=> $button{$b}->{ndx} } keys %button) { $form->print_button(\%button, $_) }
+  $form->print_button(\%button);
   
   $form->{sort} ||= "transdate";
   $form->{direction} ||= "ASC";
@@ -613,6 +607,8 @@ sub transactions {
 
   push @columns, "gifi_contra";
   $column_data{gifi_contra} = $column_data{contra};
+  $form->{l_gifi_contra} = "Y" if ($form->{l_gifi_accno} && $form->{l_contra});
+  delete $form->{l_contra} unless $form->{l_accno};
   
   $columns{debit} = 1;
   $columns{credit} = 1;
@@ -953,7 +949,7 @@ sub transactions {
   
   $form->hide_form(qw(callback path login report reportcode reportlogin column_index flds sort direction));
   
-  for (sort { $button{$a}->{ndx} <=> $button{$b}->{ndx} } keys %button) { $form->print_button(\%button, $_) }
+  $form->print_button(\%button);
   
   if ($form->{menubar}) {
     require "$form->{path}/menu.pl";
@@ -1019,12 +1015,14 @@ sub update {
   
   $form->{oldcurrency} = $form->{currency};
 
+  &rebuild_departments if $form->{department} ne $form->{olddepartment};
+
   @f = ();
   $count = 0;
   @flds = qw(accno debit credit projectnumber source memo cleared fx_transaction);
 
   for $i (1 .. $form->{rowcount}) {
-    unless (($form->{"debit_$i"} eq "") && ($form->{"credit_$i"} eq "")) {
+    if ($form->{"debit_$i"} || $form->{"credit_$i"}) {
       for (qw(debit credit)) { $form->{"${_}_$i"} = $form->parse_amount(\%myconfig, $form->{"${_}_$i"}) }
       
       push @f, {};
@@ -1159,6 +1157,8 @@ sub display_rows {
 sub form_header {
 
   for (qw(reference description notes)) { $form->{$_} = $form->quote($form->{$_}) }
+  
+  $reference_documents = &references;
 
   if (($rows = $form->numtextrows($form->{description}, 50)) > 1) {
     $description = qq|<textarea name=description rows=$rows cols=50 wrap=soft>$form->{description}</textarea>|;
@@ -1179,7 +1179,7 @@ sub form_header {
 		<td>
 		  <table>
 		    <tr>
-                      <td><select name=currency onChange="javascript:document.forms[0].submit()">|
+                      <td><select name=currency onChange="javascript:document.main.submit()">|
 		      .$form->select_option($form->{selectcurrency}, $form->{currency})
 		      .qq|</select></td>|;
 
@@ -1194,10 +1194,11 @@ sub form_header {
     $exchangerate .= qq|</tr></table></td></tr>|;
   }
   
-
   $department = qq|
 	  <th align=right nowrap>|.$locale->text('Department').qq|</th>
-	  <td><select name=department>|.$form->select_option($form->unescape($form->{selectdepartment}), $form->{department}, 1).qq|</select></td>
+	  <td><select name=department onChange="javascript:document.main.submit()">|
+          .$form->select_option($form->{selectdepartment}, $form->{department}, 1)
+          .qq|</select></td>
 | if $form->{selectdepartment};
 
   $project = qq| 
@@ -1219,21 +1220,21 @@ sub form_header {
 |;
   } else {
     $transdate = qq|
-	  <td><input name=transdate size=11 class=date title="$myconfig{dateformat}" value=$form->{transdate}></td>
+	  <td><input name=transdate size=11 class=date title="$myconfig{dateformat}" value=$form->{transdate}>|.&js_calendar("main", "transdate").qq|</td>
 |;
   }
 
-  $reference_documents = &reference_documents;
-
   $form->header;
+  
+  &calendar;
 
   print qq|
-<body onload="document.forms[0].${focus}.focus()" />
+<body onload="document.main.${focus}.focus()" />
 
-<form method=post action=$form->{script}>
+<form method="post" name="main" action="$form->{script}">
 |;
 
-  $form->hide_form(qw(id fxadj closedto locked oldtransdate oldcurrency recurring batch batchid batchnumber batchdescription defaultcurrency precision helpref reference_rows referenceurl));
+  $form->hide_form(qw(id fxadj closedto locked oldtransdate oldcurrency recurring batch batchid batchnumber batchdescription defaultcurrency precision helpref reference_rows referenceurl olddepartment));
   $form->hide_form(map { "select$_" } qw(accno department currency));
   
   print qq|
@@ -1312,12 +1313,12 @@ sub form_footer {
     $difference = qq|
         <tr>
           <th>&nbsp;</th>
-	  $fx_transaction
+          $fx_transaction
           <th align=right>$form->{differencedebit}</th>
           <th align=right>$form->{differencecredit}</th>
           <th>&nbsp;</th>
           <th>&nbsp;</th>
-	  $project
+          $project
         </tr>
 |;
   } else {
@@ -1382,7 +1383,8 @@ sub form_footer {
     $f{'Schedule'} = 0 if $form->{batch};
     
     for (keys %button) { delete $button{$_} if ! $f{$_} }
-    for (sort { $button{$a}->{ndx} <=> $button{$b}->{ndx} } keys %button) { $form->print_button(\%button, $_) }
+
+    $form->print_button(\%button);
     
   }
   
@@ -1473,6 +1475,8 @@ sub post {
     }
   }
 
+  $form->{userspath} = $userspath;
+  
   if ($form->{batch}) {
     $rc = VR->post_transaction(\%myconfig, \%$form);
   } else {

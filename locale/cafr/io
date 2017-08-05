@@ -20,6 +20,7 @@ $self{texts} = {
   'Contact'                     => 'Contact',
   'Continue'                    => 'Continuer',
   'Copies'                      => 'Copies',
+  'Cost'                        => 'Coût',
   'Country'                     => 'Pays',
   'Date'                        => 'Date',
   'Dec'                         => 'Déc.',
@@ -92,12 +93,15 @@ $self{texts} = {
   'To'                          => 'À',
   'Translation not on file!'    => 'Pas de traduction dans le fichier',
   'Unit'                        => 'Unité',
+  'Vendor'                      => 'Fournisseur',
   'Work Order'                  => 'Fiche de traitement',
   'Zip/Postal Code'             => 'Code postal',
   'sent'                        => 'envoyé',
 };
 
 $self{subs} = {
+  'api_email_invoice'           => 'api_email_invoice',
+  'api_quit'                    => 'api_quit',
   'calc_markup'                 => 'calc_markup',
   'check_form'                  => 'check_form',
   'create_form'                 => 'create_form',
