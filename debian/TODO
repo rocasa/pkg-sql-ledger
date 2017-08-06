@@ -1,3 +1,82 @@
+  Debian packaging TODO for sql-ledger
+
+===============================================================================
+
+- Rewrite debian/copyright, following copyright-format v1.0 guidelines.
+https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+-------------------------------------------------------------------------------
+  - Bugs regarding updating package to a new v3.2.x upstream:
+
+  - sql-ledger: New upstream version 3.2.5
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862953
+
+  - Version 3.2 of SQL Ledger now available
+https://bugs.launchpad.net/ubuntu/+source/sql-ledger/+bug/1537461
+
+- Obtained an updated v3.2.5 archive and did a test build, which resulted
+  in the following new issues:
+1) The existing latex-cmdline-option patch did not apply as is to the new
+   upstream. That will need to be resolved in order to proceed. 
+2) More importantly; it results in a new Lintian Error:
+E: sql-ledger source: source-is-missing js/calendar.js line length is 1212 characters (>512)
+   - That 'js/calendar.js' file is also public domain, so besides resolving the
+   'source-is-missing' issue, the debian/copyright file will need to be updated.
+   for it.
+   
+-------------------------------------------------------------------------------
+- The reporter for Debian bug #869994 noted that the error came up like
+  this:  Can't locate bin/mozilla/login.pl in @INC
+- Which is why the pkg-perl team retitled the bug using that.
+
+-> Before confirming the bug, do an install and configuration of the pkg
+version currently in Debian (3.0.8-1) on a buster install (which I still
+need to set up) in order to see what the error message actually is on a
+Debian system using the pkg install, instead of on an mmanually installed
+version  of the application. (Perhaps try in on stretch as well, although
+there the issue can be worked around, from what I understand.
+- If it is the same, just confirm the bug.
+
+-------------------------------------------------------------------------------
+  - Debian bugs:
+https://bugs.debian.org/cgi-bin/pkgreport.cgi?archive=0;dist=unstable;ordering=normal;repeatmerged=0;src=sql-ledger
+https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=sql-ledger;dist=unstable
+
+sql-ledger: Can't locate bin/mozilla/login.pl in @INC
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=869994
+
+ITA: sql-ledger -- Web based double-entry accounting program
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862963
+
+  - Ubuntu Bugs 
+- https://bugs.launchpad.net/ubuntu/+source/sql-ledger
+    - Currently, 3; 2 of which are version related
+
+
+-------------------------------------------------------------------------------
+
+  - From: https://packages.qa.debian.org/s/sql-ledger.html
+
+Package sql-ledger shares 9.0 MB of similar files with itself[1], please 
+investigate whether it is possible to reduce the duplication[2].'
+
+
+[1] https://dedup.debian.net/compare/sql-ledger/sql-ledger
+[2] https://wiki.debian.org/dedup.debian.net
+-------------------------------------------------------------------------------
+  - Review, as it is unclear when the page was last updated & there for how
+  much might already have been reference in the Debian packaging:
+http://www.sql-ledger.com/cgi-bin/nav.pl?page=misc/packaging.html&title=Packaging
+-------------------------------------------------------------------------------
+- I think that the git packaging repository at alioth should really be named 
+as 'pkg-sql-ledger' rather than as just 'sql-ledger'. Currently, it's at:
+
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/sql-ledger.git
+Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/sql-ledger.git
+
+-------------------------------------------------------------------------------
+  -Original TODO (& therefore, old) from package:
+
 Known bugs :
 - postinst doesn't handle well apache2. It tries to create /etc/apache/httpd.conf 
   => Make use of "wwwconfig-common" to be nicer about apache configuration ?
