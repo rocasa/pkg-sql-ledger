@@ -1,0 +1,405 @@
+Author: Robert James Clay <jame@rocasa.us>
+Description: Add code to application scripts in an attempt to resolve issues
+ regarding when it runs under Perl v5.26 or later that can result in an error:
+ Can't locate bin/mozilla/login.pl in @INC. Reference also the security 
+ section in: https://metacpan.org/pod/release/XSAWYERX/perl-5.26.0/pod/perldelta.pod#Removal-of-the-current-directory-%28%22.%22%29-from-@INC
+Origin: vendor
+Last-Update: 2017-12-06
+--- a/admin.pl
++++ b/admin.pl
+@@ -26,6 +26,12 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
+ 
+ $| = 1;
+ 
+--- a/am.pl
++++ b/am.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ap.pl
++++ b/ap.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ar.pl
++++ b/ar.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/bp.pl
++++ b/bp.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++ 
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ca.pl
++++ b/ca.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/cp.pl
++++ b/cp.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ct.pl
++++ b/ct.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/gl.pl
++++ b/gl.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/hr.pl
++++ b/hr.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ic.pl
++++ b/ic.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/im.pl
++++ b/im.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ir.pl
++++ b/ir.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/is.pl
++++ b/is.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/jc.pl
++++ b/jc.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/login.pl
++++ b/login.pl
+@@ -26,6 +26,12 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
+ 
+ $| = 1;
+ 
+--- a/menu.pl
++++ b/menu.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/oe.pl
++++ b/oe.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/pe.pl
++++ b/pe.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/ps.pl
++++ b/ps.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/rc.pl
++++ b/rc.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/rp.pl
++++ b/rp.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/setup.pl
++++ b/setup.pl
+@@ -8,6 +8,13 @@
+ #
+ #######################################################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ if ($ENV{HTTP_USER_AGENT}) {
+--- a/sm.pl
++++ b/sm.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
+--- a/vr.pl
++++ b/vr.pl
+@@ -26,6 +26,13 @@
+ %printer = ();
+ ########## end ###########################################
+ 
++BEGIN {
++    my $dir = "/usr/share/sql-ledger";
++    chdir $dir or die "Can't chdir to $dir: $!\n";
++    # safe now
++    push @INC, '.';
++}
++
+ $| = 1;
+ 
+ use SL::Form;
