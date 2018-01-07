@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-# -n do not include custom_ scripts
+# -n do not include custom scripts
 # -a build all file
 # -m do not generate missing files
+# -c character set
 
 use FileHandle;
-
 
 $basedir = "../..";
 $bindir = "$basedir/bin/mozilla";
@@ -21,24 +21,19 @@ $language = <FH>;
 close(FH);
 chomp $language;
 $language =~ s/\((.*)\)/$1/;
-$charset = $1;
+$c = $1 || 'UTF8';
+$charset = ($arg{c}) ? $c : "";
 
 opendir DIR, "$bindir" or die "$!";
-@progfiles = grep { /\.pl/; !/(_|^\.|temp)/ } readdir DIR;
-seekdir DIR, 0;
-@customfiles = grep /_/, readdir DIR;
+@progfiles = grep { /\.pl/ } readdir DIR;
 closedir DIR;
 
-# put customized files into @customfiles
-@customfiles = () if ($arg{n});
-
-if ($arg{n}) {
-  @menufiles = ($menufile);
-} else {
-  opendir DIR, "$basedir" or die "$!";
-  @menufiles = grep { /.*?_$menufile$/ } readdir DIR;
-  closedir DIR;
-  unshift @menufiles, $menufile;
+# custom logins
+if (!$arg{n}) {
+  if (opendir DIR, "$bindir/custom") {
+    @customlogins = grep !/(\.pl|\.)/, readdir DIR;
+    closedir DIR;
+  }
 }
 
 if (-f "all") {
@@ -57,8 +52,6 @@ if (-f 'missing') {
   unlink "missing";
 }
 
-#goto NEW;
-
 foreach $file (@progfiles) {
   
   %locale = ();
@@ -69,19 +62,20 @@ foreach $file (@progfiles) {
   
   &scanfile("$bindir/$file");
 
-  # scan custom_{module}.pl or {login}_{module}.pl files
-  foreach $customfile (@customfiles) {
-    if ($customfile =~ /_$file/) {
-      if (-f "$bindir/$customfile") {
-	&scanfile("$bindir/$customfile");
-      }
-    }
+  # scan custom/{module}.pl and custom/{login}/{module}.pl files
+  &scanfile("$bindir/custom/$file");
+
+  foreach $customlogin (@customlogins) {
+    &scanfile("$bindir/custom/$customlogin/$file");
   }
   
   # if this is the menu.pl file
   if ($file eq 'menu.pl') {
-    foreach $item (@menufiles) {
-      &scanmenu("$basedir/$item");
+    &scanmenu("$basedir/$menufile");
+    &scanmenu("$bindir/custom/$menufile");
+
+    foreach $customlogin (@customlogins) {
+      &scanmenu("$bindir/custom/$customlogin/$menufile");
     }
   }
   
@@ -174,9 +168,9 @@ $self{subs} = {
 |;
 
       foreach $text (@missing) {
-	$text =~ s/'/\\'/g;
-	$text =~ s/\\$/\\\\/;
-	print FH qq|  '$text'|.(' ' x (27-length($text))).qq| => '',\n|;
+				$text =~ s/'/\\'/g;
+				$text =~ s/\\$/\\\\/;
+				print FH qq|  '$text'|.(' ' x (27-length($text))).qq| => '',\n|;
       }
 
       print FH q|};
@@ -294,7 +288,7 @@ sub scanfile {
   my ($file, $level) = @_;
 
   my $fh = new FileHandle;
-  open $fh, "$file" or die "$! : $file";
+  return unless open $fh, "$file";
 
   $file =~ s/\.pl//;
   $file =~ s/$bindir\///;
@@ -310,9 +304,9 @@ sub scanfile {
     for (keys %{$self{texts}}) {
       $all{$_} ||= $self{texts}{$_};
       if ($level) {
-	$temp{$_} ||= $self{texts}{$_};
+				$temp{$_} ||= $self{texts}{$_};
       } else {
-	$temp{$_} = $self{texts}{$_};
+				$temp{$_} = $self{texts}{$_};
       }
     }
   }
@@ -328,8 +322,11 @@ sub scanfile {
     if (/require\s+\W.*\.pl/) {
       my $newfile = $&;
       $newfile =~ s/require\s+\W//;
-      $newfile =~ s/\$form->{path}\///;
-      &scanfile("$bindir/$newfile", 1) if $newfile !~ /_/;
+      $newfile =~ s/\$form->\{path\}\///;
+
+      if ($newfile !~ /(custom|\$form->\{login\})/) {
+				&scanfile("$bindir/$newfile", 1);
+      }
     }
    
     # is this a sub ?
@@ -343,34 +340,34 @@ sub scanfile {
     
     while ($rc) {
       if (/Locale/) {
-	if (!/^use /) {
-	  my ($null, $country) = split /,/;
-	  $country =~ s/^ +["']//;
-	  $country =~ s/["'].*//;
-	}
+				if (!/^use /) {
+					my ($null, $country) = split /,/;
+					$country =~ s/^ +["']//;
+					$country =~ s/["'].*//;
+				}
       }
 
       if (/\$locale->text.*?\W\)/) {
-	my $string = $&;
-	$string =~ s/\$locale->text\(\s*['"(q|qq)]['\/\\\|~]*//;
-	$string =~ s/\W\)+.*$//;
+				my $string = $&;
+				$string =~ s/\$locale->text\(\s*['"(q|qq)]['\/\\\|~]*//;
+				$string =~ s/\W\)+.*$//;
 
         # if there is no $ in the string record it
-	unless ($string =~ /\$\D.*/) {
-	  # this guarantees one instance of string
-	  $locale{$string} = 1;
+				unless ($string =~ /\$\D.*/) {
+					# this guarantees one instance of string
+					$locale{$string} = 1;
 
           # is it a submit button before $locale->
           if (/type=submit/i) {
-	    $submit{$string} = 1;
+				    $submit{$string} = 1;
           }
 
           # is it a value before $locale->
           if (/value => \$locale/) {
-	    $submit{$string} = 1;
+	    			$submit{$string} = 1;
           }
 
-	}
+				}
       }
 
       # exit loop if there are no more locales on this line
@@ -389,7 +386,7 @@ sub scanmenu {
   my $file = shift;
 
   my $fh = new FileHandle;
-  open $fh, "$file" or die "$! : $file";
+  retunr unless open $fh, "$file";
 
   my @a = grep /^\[/, <$fh>;
   close($fh);
@@ -403,7 +400,7 @@ sub scanmenu {
     foreach $string (@b) {
       chomp $string;
       if ($string !~ /^\s*$/) {
-	$locale{$string} = 1;
+        $locale{$string} = 1;
       }
     }
   }

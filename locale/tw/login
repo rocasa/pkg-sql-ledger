@@ -1,29 +1,26 @@
-$self{charset} = 'BIG5';
+$self{charset} = 'UTF-8';
 
 $self{texts} = {
-  'Company'                     => '¤½¥q',
-  'Continue'                    => 'Ä~Äò',
-  'Dataset is newer than version!' => '¸û·s¸ê®Æ¶°¡I',
-  'Incorrect Dataset version!'  => '¸ê®Æ¶°ª©¥»¿ù»~¡I',
-  'Login'                       => 'µn¤J',
-  'Name'                        => '¦WºÙ',
-  'No email address for'        => '¥¼«ü©ú¹q¤l¶l¥ó¦a§}',
-  'Password'                    => '±K½X',
-  'Upgrading to Version'        => '¥¿¤É¯Å¦Ü·sª©',
-  'Version'                     => 'ª©¥»',
-  'You did not enter a name!'   => '§A¨Ã¥¼Áä¤J¦WºÙ¡I',
+  'Access Denied!'              => 'æ‹’çµ•å­˜å–ï¼',
+  'Company'                     => 'å…¬å¸',
+  'Continue'                    => 'ç¹¼çºŒ',
+  'Dataset is newer than version!' => 'è¼ƒæ–°è³‡æ–™é›†ï¼',
+  'Incorrect Dataset version!'  => 'è³‡æ–™é›†ç‰ˆæœ¬éŒ¯èª¤ï¼',
+  'Login'                       => 'ç™»å…¥',
+  'Name'                        => 'åç¨±',
+  'Password'                    => 'å¯†ç¢¼',
+  'Upgrading to Version'        => 'æ­£å‡ç´šè‡³æ–°ç‰ˆ',
+  'Version'                     => 'ç‰ˆæœ¬',
+  'You did not enter a name!'   => 'ä½ ä¸¦æœªéµå…¥åç¨±ï¼',
+  'done'                        => 'å®Œæˆ',
 };
 
 $self{subs} = {
-  'continue'                    => 'continue',
-  'email_tan'                   => 'email_tan',
   'login'                       => 'login',
   'login_screen'                => 'login_screen',
   'logout'                      => 'logout',
   'selectdataset'               => 'selectdataset',
-  'tan_login'                   => 'tan_login',
-  'Ä~Äò'                        => 'continue',
-  'µn¤j'                        => 'login',
+  'ç™»å…¥'                      => 'login',
 };
 
 1;

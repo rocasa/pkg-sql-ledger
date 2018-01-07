@@ -1,22 +1,18 @@
-$self{charset} = 'ISO-8859-7';
+$self{charset} = 'UTF-8';
 
 $self{texts} = {
-  'Company'                     => 'Εταιρία',
-  'Continue'                    => 'Συνέχεια',
-  'Login'                       => 'Εισαγωγή',
-  'Name'                        => 'Όνομα',
+  'Company'                     => 'Ξ•Ο„Ξ±ΞΉΟΞ―Ξ±',
+  'Continue'                    => 'Ξ£Ο…Ξ½Ξ­Ο‡ΞµΞΉΞ±',
+  'Login'                       => 'Ξ•ΞΉΟƒΞ±Ξ³Ο‰Ξ³Ξ®',
+  'Name'                        => 'ΞΞ½ΞΏΞΌΞ±',
 };
 
 $self{subs} = {
-  'continue'                    => 'continue',
-  'email_tan'                   => 'email_tan',
   'login'                       => 'login',
   'login_screen'                => 'login_screen',
   'logout'                      => 'logout',
   'selectdataset'               => 'selectdataset',
-  'tan_login'                   => 'tan_login',
-  'Συνέχεια'                    => 'continue',
-  'Εισαγωγή'                    => 'login',
+  'Ξ•ΞΉΟƒΞ±Ξ³Ο‰Ξ³Ξ®'                    => 'login',
 };
 
 1;

@@ -1,9 +1,14 @@
 <ul>
 
+<p><li><h4>spool and template directory missing</h4>
+The latest archives, starting with 3.0.7, do not have a spool and/or templates
+directory. Add the directories with web server write privileges in the
+sql-ledger directory before calling up admin.pl
+
 <p><li><h4>Apache 2.4 configuration</h4>
 <pre>
 AddHandler cgi-script .pl
-AddDefaultCharset On
+
 Alias /sql-ledger /usr/local/sql-ledger/
 &lt;Directory /usr/local/sql-ledger&gt;
   Options ExecCGI Includes FollowSymlinks
@@ -124,7 +129,7 @@ CREATE TABLE assembly (
 ) WITH OIDS;
 </pre>
 
-This change is only required for SQL-Ledger versions 2.6.3 and older!
+This change is only required for SQL-Ledger versions 2.6.4 and older!
 
 <p>If you already built a dataset without this change you will get
 an error when you try to save a PO or assembly.

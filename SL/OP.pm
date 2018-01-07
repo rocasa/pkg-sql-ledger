@@ -20,7 +20,8 @@ sub overpayment {
   my $fxamount = $form->round_amount($amount * $form->{exchangerate}, $form->{precision});
   my ($paymentaccno) = split /--/, $form->{"$form->{ARAP}_paid"};
 
-  my ($null, $department_id) = split /--/, $form->{department};
+  my $department_id;
+  (undef, $department_id) = split /--/, $form->{department};
   $department_id *= 1;
 
   my $action = 'posted';
@@ -34,6 +35,8 @@ sub overpayment {
   
   my $uid = localtime;
   $uid .= $$;
+
+  $form->{vc} =~ s/;//g;
 
   # add AR/AP header transaction with a payment
   $query = qq|INSERT INTO $form->{arap} (invnumber, employee_id, approved)

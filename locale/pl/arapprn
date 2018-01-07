@@ -1,4 +1,4 @@
-$self{charset} = 'ISO-8859-2';
+$self{charset} = 'UTF-8';
 
 $self{texts} = {
   'Account'                     => 'Konto',
@@ -10,8 +10,9 @@ $self{texts} = {
   'PDF'                         => 'PDF',
   'Postscript'                  => 'Postscript',
   'Screen'                      => 'Ekran',
-  'Select payment'              => 'Wybierz p³atno¶æ',
-  'Source'                      => '¯ród³o',
+  'Select payment'              => 'Wybierz pÅ‚atnoÅ›Ä‡',
+  'Select postscript or PDF!'   => 'Wybierz postscript lub PDF',
+  'Source'                      => 'Å»rÃ³dÅ‚o',
 };
 
 $self{subs} = {
@@ -22,7 +23,6 @@ $self{subs} = {
   'print_credit_note'           => 'print_credit_note',
   'print_debit_note'            => 'print_debit_note',
   'print_options'               => 'print_options',
-  'print_payslip'               => 'print_payslip',
   'print_receipt'               => 'print_receipt',
   'print_remittance_voucher'    => 'print_remittance_voucher',
   'print_transaction'           => 'print_transaction',

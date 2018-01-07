@@ -1,13 +1,14 @@
-$self{charset} = 'ISO-8859-13';
+$self{charset} = 'UTF-8';
 
 $self{texts} = {
-  'Account'                     => 'Sàskaita',
+  'Account'                     => 'SÄ…skaita',
   'Amount'                      => 'Suma',
-  'Continue'                    => 'Tæsti',
+  'Continue'                    => 'TÄ™sti',
   'Date'                        => 'Data',
   'PDF'                         => 'PDF',
   'Postscript'                  => 'Postscript(TM)',
   'Screen'                      => 'Ekranas',
+  'Select postscript or PDF!'   => 'IÅ¡rinkite postscript arba PDF!',
   'Source'                      => 'Dokumentas',
 };
 
@@ -19,12 +20,11 @@ $self{subs} = {
   'print_credit_note'           => 'print_credit_note',
   'print_debit_note'            => 'print_debit_note',
   'print_options'               => 'print_options',
-  'print_payslip'               => 'print_payslip',
   'print_receipt'               => 'print_receipt',
   'print_remittance_voucher'    => 'print_remittance_voucher',
   'print_transaction'           => 'print_transaction',
   'select_payment'              => 'select_payment',
-  'tæsti'                       => 'continue',
+  'tÄ™sti'                       => 'continue',
 };
 
 1;

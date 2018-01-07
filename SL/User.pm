@@ -23,7 +23,7 @@ sub new {
     open(MEMBER, "$memfile");
     
     while (<MEMBER>) {
-      if (/^\[$login\]/) {
+      if (/^\[\Q$login\E\]/) {
 	while (<MEMBER>) {
 	  last if /^\[/;
 	  next if /^(#|\s)/;
@@ -40,6 +40,9 @@ sub new {
 	}
 	
 	$self->{login} = $login;
+        $self->{lat} = "1";
+        $self->{long} = "1";
+        $self->{templates} ||= $self->{dbname};
 
 	last;
       }
@@ -97,7 +100,7 @@ sub login {
 
     $self->{password} = $form->{password};
 
-    $self->create_config("$userspath/$self->{login}.conf");
+    return -1 unless $self->create_config("$userspath/$self->{login}.conf");
     
     $self->{dbpasswd} = unpack 'u', $self->{dbpasswd};
   
@@ -135,8 +138,9 @@ sub login {
 
     if ($audittrail) {
       $id *= 1;
-      $query = qq|INSERT INTO audittrail (employee_id, action)
-                  VALUES ($id, 'login')|;
+      my $ref = "$ENV{REMOTE_ADDR}";
+      $query = qq|INSERT INTO audittrail (trans_id, reference, action, employee_id)
+                  VALUES ($id, '$ref', 'login', $id)|;
       $dbh->do($query);
     }
 
@@ -173,15 +177,25 @@ sub logout {
   my %defaults = $form->get_defaults($dbh, \@{['audittrail']});
 
   if ($defaults{audittrail}) {
-    $login = $form->{login};
+    my $login = $form->{login};
     $login =~ s/\@.*//;
     $query = qq|SELECT id
                 FROM employee
 		WHERE login = '$login'|;
-    ($id) = $dbh->selectrow_array($query);
+    my ($id) = $dbh->selectrow_array($query);
     $id *= 1;
-    $query = qq|INSERT INTO audittrail (action, employee_id)
-                VALUES ('logout', $id)|;
+
+    $query = qq|SELECT reference
+                FROM audittrail
+                WHERE employee_id = $id
+                AND action = 'login'
+                ORDER BY transdate DESC
+                LIMIT 1|;
+    my ($ref) = $dbh->selectrow_array($query);
+    $ref ||= $ENV{REMOTE_ADDR};
+    
+    $query = qq|INSERT INTO audittrail (trans_id, reference, action, employee_id)
+                VALUES ($id, '$ref', 'logout', $id)|;
     $dbh->do($query);
   }
 
@@ -230,6 +244,10 @@ sub dbconnect_vars {
   }
 
   $form->{dboptions} = $dboptions{$form->{dbdriver}}{$form->{dateformat}};
+
+  if ($form->{encoding}) {
+    $form->{dboptions} .= ';set client_encoding to \''.$form->{encoding}."'";
+  }
 
   if ($form->{dbdriver} =~ /(Pg|Sybase)/) {
     $form->{dbconnect} = "dbi:$form->{dbdriver}:dbname=$db";
@@ -368,6 +386,8 @@ sub dbsources {
 sub dbcreate {
   my ($self, $form) = @_;
 
+  for (qw(db encoding)) { $form->{$_} =~ s/;//g }
+
   my %dbcreate = ( 'Pg' => qq|CREATE DATABASE "$form->{db}"|,
                 'Sybase' => qq|CREATE DATABASE $form->{db}|,
                'Oracle' => qq|CREATE USER "$form->{db}" DEFAULT TABLESPACE USERS TEMPORARY TABLESPACE TEMP IDENTIFIED BY "$form->{db}"|);
@@ -417,6 +437,10 @@ sub dbcreate {
   $filename = qq|sql/$form->{chart}-chart.sql|;
   $self->process_query($form, $dbh, $filename);
 
+  # load mimetypes
+  $filename = qq|sql/Mimetype.sql|;
+  $self->process_query($form, $dbh, $filename);
+
   # create indices
   $filename = qq|sql/${dbdriver}-indices.sql|;
   $self->process_query($form, $dbh, $filename);
@@ -428,9 +452,15 @@ sub dbcreate {
   }
 
   $query = qq|INSERT INTO defaults (fldname, fldvalue)
-              VALUES ('company', '$form->{company}')|;
-  $dbh->do($query);
- 
+              VALUES (?, ?)|;
+  my $sth = $dbh->prepare($query);
+  
+  $sth->execute('company', $form->{company});
+  $sth->finish;
+
+  $sth->execute('roundchange', 0.01);
+  $sth->finish;
+  
   $dbh->disconnect;
 
   1;
@@ -447,12 +477,18 @@ sub process_query {
   open(FH, "$filename") or $form->error("$filename : $!\n");
   my $query = "";
   my $loop = 0;
+  my $i;
   
   while (<FH>) {
+    $i++;
 
     if ($loop && /^--\s*end\s*(procedure|function|trigger)/i) {
       $loop = 0;
-      $dbh->do($query) || $form->dberror("$filename : $query");
+      $dbh->do($query);
+      
+      if ($errstr = $DBI::errstr) {
+        $form->info("$filename:$i - $errstr\n");
+      }
       $query = "";
       next;
     }
@@ -476,7 +512,11 @@ sub process_query {
       $query =~ s/;\s*$//;
       $query =~ s/\\'/''/g;
 
-      $dbh->do($query) || $form->dberror("$filename : $query");
+      $dbh->do($query);
+      
+      if ($errstr = $DBI::errstr) {
+        $form->info("$filename:$i - $errstr\n");
+      }
 
       $query = "";
     }
@@ -490,6 +530,8 @@ sub process_query {
 
 sub dbdelete {
   my ($self, $form) = @_;
+
+  $form->{db} =~ s/;//g;
 
   my %dbdelete = ( 'Pg' => qq|DROP DATABASE "$form->{db}"|,
                 'Sybase' => qq|DROP DATABASE $form->{db}|,
@@ -567,7 +609,29 @@ sub dbupdate {
   $dbh->disconnect;
 
 }
-  
+
+
+sub dbpassword {
+  my ($self, $form) = @_;
+
+  &dbconnect_vars($form, $form->{dbname});
+
+  my $dbh = DBI->connect($form->{dbconnect}, $form->{dbuser}, $form->{dbpasswd}) or $form->dberror;
+
+  my $query;
+
+  if ($form->{new_password}) {
+    $query = qq|ALTER ROLE $form->{dbuser} WITH PASSWORD '$form->{new_password}'|;
+  } else {
+    $query = qq|ALTER ROLE $form->{dbuser} WITH PASSWORD NULL|;
+  }
+
+  $dbh->do($query) or $form->dberror($query);
+
+  $dbh->disconnect;
+
+}
+
 
 sub calc_version {
   
@@ -616,21 +680,26 @@ sub create_config {
 
   $self->{dbpasswd} = unpack 'u', $self->{dbpasswd};
 
-  my $dbh = DBI->connect($self->{dbconnect}, $self->{dbuser}, $self->{dbpasswd}) or $self->error($DBI::errstr);
+  my $dbh = DBI->connect($self->{dbconnect}, $self->{dbuser}, $self->{dbpasswd});
+  $self->error($DBI::errstr) unless $dbh;
   
   my $id;
   my %acs;
   my $login = $self->{login};
   $login =~ s/@.*//;
   
-  $query = qq|SELECT e.acs, a.acs
+  $query = qq|SELECT e.id, e.acs, a.acs
 	      FROM employee e
 	      LEFT JOIN acsrole a ON (e.acsrole_id = a.id)
 	      WHERE login = '$login'|;
-  ($acs{acs}, $acs{role}) = $dbh->selectrow_array($query);
+  ($id, $acs{acs}, $acs{role}) = $dbh->selectrow_array($query);
 
   $dbh->disconnect;
 
+  if (!$id) {
+    return if $login ne 'admin';
+  }
+ 
   $acs{acs} .= ";$acs{role}";
   for (split /;/, $acs{acs}) {
     $acs{$_} = 1;
@@ -639,7 +708,7 @@ sub create_config {
   delete $acs{acs};
   delete $acs{role};
 
-  $self->{acs} = join ';', keys %acs;
+  $self->{acs} = join ';', sort keys %acs;
 
   my $password = $self->{password};
   my $key = "";
@@ -672,10 +741,10 @@ sub create_config {
 
   $self->{dbpasswd} = pack 'u', $self->{dbpasswd};
   chomp $self->{dbpasswd};
-  
+
   umask(002);
   open(CONF, ">$filename") or $self->error("$filename : $!");
-  
+
   # create the config file
   print CONF qq|# configuration file for $self->{login}
 
@@ -697,6 +766,8 @@ sub create_config {
   close CONF;
 
   $self->{password} = $password;
+
+  1;
 
 }
 
@@ -808,13 +879,66 @@ sub delete_login {
 
 sub config_vars {
 
-  my @conf = qw(acs company countrycode dateformat
+  my @conf = qw(acs company countrycode charset dateformat
              dbconnect dbdriver dbhost dbname dboptions dbpasswd
 	     dbport dbuser menuwidth name email numberformat password
 	     outputformat printer sessionkey sid
-	     signature stylesheet tan timeout vclimit);
+	     signature stylesheet tan templates timeout vclimit);
 
   @conf;
+
+}
+
+
+sub encoding {
+  my ($self, $dbdriver) = @_;
+
+  my %encoding = ( Pg => qq|
+SQL_ASCII--ASCII
+UTF8--Unicode (UTF-8)
+EUC_JP--Japanese (EUC_JP)
+EUC_JP--Japanese (EUC_JIS_2004)
+SJIS--Japanese (SJIS)
+SHIFT_JIS_2004--Japanese (SHIFT_JIS_2004)
+EUC_KR--Korean
+JOHAB--Korean (Hangul)
+UHC--Korean (Unified Hangul Code)
+EUC_TW--Taiwanese
+BIG5--Traditional Chinese (BIG5)
+EUC_CN--Simplified Chinese (GB18030)
+GBK--Simplified Chinese (GBK)
+GB18030--Chinese
+KOI8R--Cyrillic (Russian)
+KOI8U--Cyrillic (Ukrainian)
+LATIN1--ISO 8859-1 Western Europe
+LATIN2--ISO 8859-2 Central Europe
+LATIN3--ISO 8859-3 South Europe
+LATIN4--ISO 8859-4 North Europe
+LATIN5--ISO 8859-9 Turkish
+LATIN6--ISO 8859-10 Nordic
+LATIN7--ISO 8859-13 Baltic
+LATIN8--ISO 8859-14 Celtic
+LATIN9--ISO 8859-15 (Latin 1 with Euro and accents)
+LATIN10--ISO 8859-16 Romanian
+ISO_8859_5--ISO 8859-5/ECMA 113 (Latin/Cyrillic)
+ISO_8859_6--ISO 8859-6/ECMA 114 (Latin/Arabic)
+ISO_8859_7--ISO 8859-7/ECMA 118 (Latin/Greek)
+ISO_8859_8--ISO 8859-8/ECMA 121 (Latin/Hebrew)
+MULE_INTERNAL--Multilingual Emacs
+WIN866--Windows CP866 (Cyrillic)
+WIN874--Windows CP874 (Thai)
+WIN1250--Windows CP1250 (Central Euope)
+WIN--Windows CP1251 (Cyrillic)
+WIN1252--Windows CP1252 (Western European)
+WIN1253--Windows CP1253 (Greek)
+WIN1254--Windows CP1254 (Turkish)
+WIN1255--Windows CP1255 (Hebrew)
+WIN1256--Windows CP1256 (Arabic)
+WIN1257--Windows CP1257 (Baltic)
+WIN1258--Windows CP1258 (Vietnamese)|
+  );
+
+  $encoding{$dbdriver};
 
 }
 

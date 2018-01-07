@@ -20,6 +20,7 @@ $self{texts} = {
   'Contact'                     => 'Contact',
   'Continue'                    => 'Verder',
   'Copies'                      => 'Kopieën',
+  'Cost'                        => 'Kost',
   'Country'                     => 'Land',
   'Date'                        => 'Datum',
   'Dec'                         => 'Dec',
@@ -91,11 +92,14 @@ $self{texts} = {
   'Subtotal'                    => 'Subtotaal',
   'To'                          => 'Tot',
   'Unit'                        => 'Eenheid',
+  'Vendor'                      => 'Leverancier',
   'Work Order'                  => 'Bedrijfs order',
   'sent'                        => 'verzonden',
 };
 
 $self{subs} = {
+  'api_email_invoice'           => 'api_email_invoice',
+  'api_quit'                    => 'api_quit',
   'calc_markup'                 => 'calc_markup',
   'check_form'                  => 'check_form',
   'create_form'                 => 'create_form',

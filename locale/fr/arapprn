@@ -1,17 +1,21 @@
+$self{charset} = 'UTF-8';
+
 $self{texts} = {
   'Account'                     => 'Compte',
   'Amount'                      => 'Montant',
   'Continue'                    => 'Continuer',
+  'DCN missing!'                => 'N° Contrôle Document Manquant!',
   'Date'                        => 'Date',
-  'Memo'                        => 'M�mo',
-  'Nothing to print!'           => 'Rien � imprimer',
+  'Memo'                        => 'Mémo',
+  'Nothing to print!'           => 'Rien à  imprimer',
   'PDF'                         => 'PDF',
   'Postscript'                  => 'Postcript',
-  'Screen'                      => '�cran',
+  'RVC missing!'                => 'RVC manquant',
+  'Screen'                      => 'Ã©cran',
   'Select a Printer!'           => 'Choisir une imprimante',
-  'Select payment'              => 'S�lectionner le payement',
+  'Select payment'              => 'Sélectionner le paiement',
+  'Select postscript or PDF!'   => 'Sélectionner Postscript ou PDF!',
   'Source'                      => 'Source',
-  'Text'                        => 'Texte',
 };
 
 $self{subs} = {
@@ -22,7 +26,6 @@ $self{subs} = {
   'print_credit_note'           => 'print_credit_note',
   'print_debit_note'            => 'print_debit_note',
   'print_options'               => 'print_options',
-  'print_payslip'               => 'print_payslip',
   'print_receipt'               => 'print_receipt',
   'print_remittance_voucher'    => 'print_remittance_voucher',
   'print_transaction'           => 'print_transaction',

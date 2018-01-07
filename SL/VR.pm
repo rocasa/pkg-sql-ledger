@@ -22,6 +22,8 @@ sub create_links {
   # employees
   $form->all_employees($myconfig, $dbh, undef, 0);
 
+  $form->all_years($myconfig, $dbh);
+
   $form->remove_locks($myconfig, $dbh, 'br');
 
   $dbh->disconnect;
@@ -74,13 +76,14 @@ sub list_batches {
 
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
-  my $null;
   my $var;
 
   my %defaults = $form->get_defaults($dbh, \@{['precision', 'company']});
   for (keys %defaults) { $form->{$_} = $defaults{$_} }
   
-  ($form->{transdatefrom}, $form->{transdateto}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
+  unless ($form->{transdatefrom} || $form->{transdateto}) {
+    ($form->{transdatefrom}, $form->{transdateto}) = $form->from_to($form->{year}, $form->{month}, $form->{interval}) if $form->{year} && $form->{month};
+  }
  
   my $query = qq|SELECT a.id, a.batch, a.batchnumber, a.description,
                  a.transdate, a.apprdate, a.amount,
@@ -93,7 +96,7 @@ sub list_batches {
   $where .= " AND a.batch = '$form->{batch}'" if $form->{batch};
 
   if ($form->{employee}) {
-    ($null, $var) = split /--/, $form->{employee};
+    (undef, $var) = split /--/, $form->{employee};
     $where .= " AND a.employee_id = $var";
   }
 
@@ -196,6 +199,9 @@ sub list_vouchers {
   # connect to database
   my $dbh = $form->dbconnect($myconfig);
 
+  my %defaults = $form->get_defaults($dbh, \@{['precision']});
+  $form->{precision} = $defaults{precision};
+
   my $ml = 1;
   
   my $query = qq|SELECT batchnumber, description, transdate, apprdate, batch
@@ -213,8 +219,7 @@ sub list_vouchers {
                 FROM vr
 		JOIN ap a ON (a.id = vr.trans_id)
 		JOIN vendor v ON (v.id = a.vendor_id)
-		WHERE vr.br_id = $form->{batchid}
-                ORDER by $sortorder|;
+		WHERE vr.br_id = $form->{batchid}|;
 
   } elsif ($form->{batch} eq 'payment') {
 
@@ -295,6 +300,8 @@ sub delete_transaction {
   my $table = "ap";
   $table = "gl" if $form->{batch} eq 'gl';
   
+  $form->{id} *= 1;
+
   $query = qq|SELECT amount
               FROM $table
 	      WHERE id = $form->{id}|;
@@ -338,7 +345,9 @@ sub delete_payment_reversal {
   # connect to database
   my $dbh = $form->dbconnect_noauto($myconfig);
   my $query;
- 
+
+  $form->{id} *= 1;
+  
   $query = qq|SELECT ac.trans_id, ac.amount * -1
               FROM acc_trans ac
 	      JOIN vr ON (vr.id = ac.vr_id)
@@ -392,6 +401,8 @@ sub delete_batch {
   # connect to database
   my $dbh = $form->dbconnect_noauto($myconfig);
   
+  $form->{batchid} *= 1;
+  
   my $query = qq|SELECT vr.id, vr.trans_id
                  FROM vr
 	         WHERE vr.br_id = $form->{batchid}|;
@@ -417,8 +428,7 @@ sub delete_batch {
 		AND ac.approved = '0'
 		AND (c.link LIKE '%AP_paid%'
 		     OR c.link LIKE '%AP_discount%')
-		AND NOT (ac.chart_id = $defaults{fxgain_accno_id}
-		      OR ac.chart_id = $defaults{fxloss_accno_id})
+		AND NOT ac.chart_id = $defaults{fxgainloss_accno_id}
 		|;
     $pth = $dbh->prepare($query) || $form->dberror($query);
     
@@ -499,6 +509,8 @@ sub post_batch {
     $disconnect = 1;
   }
 
+  $form->{batchid} *= 1;
+  
   my $query = qq|SELECT trans_id, id
                  FROM vr
 	         WHERE br_id = $form->{batchid}|;
@@ -590,6 +602,7 @@ sub payment_reversal {
                  FROM chart c
 		 LEFT JOIN translation l ON (l.trans_id = c.id AND l.language_code = '$myconfig->{countrycode}')
 		 WHERE c.link LIKE '%AP_paid%'
+                 AND c.closed = '0'
 		 ORDER BY c.accno|;
   my $sth = $dbh->prepare($query);
   $sth->execute || $form->dberror($query);
@@ -606,7 +619,7 @@ sub payment_reversal {
   my $description;
   my $translation;
 
-  if ($form->{id}) {
+  if ($form->{id} *= 1) {
     # get payment account and vouchernumber
     $query = qq|SELECT ac.source, ac.memo, c.accno, c.description,
                 l.description
@@ -637,7 +650,9 @@ sub post_payment_reversal {
   
   $form->{vouchernumber} = $form->update_defaults($myconfig, 'vouchernumber', $dbh) unless $form->{vouchernumber};
   
-  if ($form->{id}) {
+  $form->{batchid} *= 1;
+  
+  if ($form->{id} *= 1) {
 
     $query = qq|SELECT ac.amount
 		FROM acc_trans ac

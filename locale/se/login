@@ -1,27 +1,23 @@
 $self{texts} = {
-  'Company'                     => 'Företag',
-  'Continue'                    => 'Fortsätt',
-  'Dataset is newer than version!' => 'Dataset är nyare än programversionen',
+  'Access Denied!'              => 'Fel kod eller anvÃ¤ndarnamn!',
+  'Company'                     => 'FÃ¶retag',
+  'Continue'                    => 'FortsÃ¤tt',
+  'Dataset is newer than version!' => 'Dataset Ã¤r nyare Ã¤n programversionen',
   'Incorrect Dataset version!'  => 'Felaktig databasversion',
-  'Incorrect Password!'         => 'Felaktigt lösenord',
   'Login'                       => 'Logga in',
   'Name'                        => 'Namn',
-  'No email address for'        => 'Ingen E-Postadress för',
-  'Password'                    => 'Lösenord',
+  'Password'                    => 'LÃ¶senord',
   'Upgrading to Version'        => 'Uppgradera till version',
   'Version'                     => 'Version',
-  'You did not enter a name!'   => 'Du skrev inte in något namn',
+  'You did not enter a name!'   => 'Du skrev inte in nÃ¥got namn',
+  'done'                        => 'FÃ¤rdigt',
 };
 
 $self{subs} = {
-  'continue'                    => 'continue',
-  'email_tan'                   => 'email_tan',
   'login'                       => 'login',
   'login_screen'                => 'login_screen',
   'logout'                      => 'logout',
   'selectdataset'               => 'selectdataset',
-  'tan_login'                   => 'tan_login',
-  'fortsätt'                    => 'continue',
   'logga_in'                    => 'login',
 };
 

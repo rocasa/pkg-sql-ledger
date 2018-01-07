@@ -1,6 +1,6 @@
 #=====================================================================
-# SQL-Ledger ERP
-# Copyright (c) 2006
+# SQL-Ledger
+# Copyright (c) DWS Systems Inc.
 #
 #  Author: DWS Systems Inc.
 #     Web: http://www.sql-ledger.com
@@ -21,17 +21,18 @@ $form = new Form;
 
 
 $locale = new Locale $language, "login";
-$form->{charset} = $locale->{charset};
+
+$form->{charset} = $charset;
 
 # customization
-if (-f "$form->{path}/custom_$form->{script}") {
-  eval { require "$form->{path}/custom_$form->{script}"; };
+if (-f "$form->{path}/custom/$form->{script}") {
+  eval { require "$form->{path}/custom/$form->{script}"; };
   $form->error($@) if ($@);
 }
 
 # per login customization
-if (-f "$form->{path}/$form->{login}_$form->{script}") {
-  eval { require "$form->{path}/$form->{login}_$form->{script}"; };
+if (-f "$form->{path}/custom/$form->{login}/$form->{script}") {
+  eval { require "$form->{path}/custom/$form->{login}/$form->{script}"; };
   $form->error($@) if ($@);
 }
 
@@ -55,11 +56,7 @@ sub login_screen {
 
   $form->header;
 
-  if ($form->{login}) {
-   $sf = qq|function sf() { document.forms[0].password.focus(); }|;
-  } else {
-   $sf = qq|function sf() { document.forms[0].login.focus(); }|;
-  }
+  $focus = ($form->{login}) ? "password" : "login";
 
   print qq|
 <script language="javascript" type="text/javascript">
@@ -77,16 +74,17 @@ function jsp() {
   else
     document.forms[0].js.value = "1"
 }
-$sf
 // End -->
 </script>
-|;
 
-  print qq|
-
-<body class=login onload="jsp(); sf()">
+<body class=login onload="jsp(); document.forms[0].${focus}.focus()">
 
 <pre>
+
+
+
+
+
 
 </pre>
 
@@ -98,7 +96,7 @@ $sf
 
 <p>
 
-      <form method=post action=$form->{script}>
+    <form method=post name=main action=$form->{script}>
 
       <table width=100%>
 	<tr>
@@ -188,7 +186,7 @@ sub selectdataset {
 		$form->hide_form(qw(js path));
 	      
 		$checked = "checked";
-		for (sort { $login{$a} cmp $login{$b} } keys %{ $login }) {
+		for (sort { lc $login{$a} cmp lc $login{$b} } keys %{ $login }) {
 		  print qq|
 		  <br><input class=login type=radio name=login value=$_ $checked>$login->{$_}
 		  |;
@@ -235,13 +233,13 @@ sub login {
       $_ = shift @members;
       if (/^\[(.*\@.*)\]/) {
 	$login = $1;
-	if ($login =~ /^$form->{login}(\@|$)/) {
-	  ($name, $dbname) = split /\@/, $login;
+	if ($login =~ /^\Q$form->{login}\E(\@|$)/) {
+	  ($name, $dbname) = split /\@/, $login, 2;
 	  $login{$login} = $dbname;
 
 	  do {
 	    if (/^company=/) {
-	      ($null, $company) = split /=/, $_, 2;
+	      (undef, $company) = split /=/, $_, 2;
 	      chop $company;
 	      $login{$login} = $company if $company;
 	    }
@@ -275,6 +273,16 @@ sub login {
 
     if ($errno == 1 && $form->{admin}) {
       $err[1] = $locale->text('admin does not exist!');
+    }
+
+    if ($errno == 4 && $form->{admin}) {
+
+      $form->info($err[4]);
+
+      $form->info("<p><a href=menu.pl?login=$form->{login}&path=$form->{path}&action=display&main=company_logo&js=$form->{js}&password=$form->{password}>".$locale->text('Continue')."</a>");
+      
+      exit;
+ 
     }
 
     if ($errno == 5) {
@@ -359,14 +367,16 @@ sub login {
 }
 
 
-
 sub logout {
 
-  require "$userspath/$form->{login}.conf";
-  $myconfig{dbpasswd} = unpack 'u', $myconfig{dbpasswd};
-
   $form->{callback} = "$form->{script}?path=$form->{path}&endsession=1";
-  User->logout(\%myconfig, \%$form);
+
+  if (-f "$userspath/$form->{login}.conf") {
+    require "$userspath/$form->{login}.conf";
+    $myconfig{dbpasswd} = unpack 'u', $myconfig{dbpasswd};
+
+    User->logout(\%myconfig, \%$form);
+  }
 
   $form->redirect;
 
@@ -381,20 +391,16 @@ sub email_tan {
   $mail = new Mailer;
 
   srand( time() ^ ($$ + ($$ << 15)) );
-  $digits = "123456789";
-  $letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  $digits = "0123456789";
   $tan = "";
-  while (length($tan) < 6) {
-    if ($d = !$d) {
-      $tan .= substr($letters, (int(rand(length($letters)))), 1);
-    } else {
-      $tan .= substr($digits, (int(rand(length($digits)))), 1);
-    }
+  while (length($tan) < 4) {
+    $tan .= substr($digits, (int(rand(length($digits)))), 1);
   }
 
   $mail->{message} = $locale->text('TAN').": $tan";
   $mail->{from} = $mail->{to} = qq|"$user->{name}" <$user->{email}>|;
   $mail->{subject} = "SQL-Ledger $form->{version} $user->{company} $mail->{message}";
+
 
   $form->error($err) if ($err = $mail->send($sendmail));
 
@@ -474,11 +480,35 @@ sub tan_login {
   }
 
   if ((crypt $form->{password}, substr($form->{login}, 0, 2)) ne $myconfig{password}) {
+    if (-f "$userspath/$form->{login}.tan") {
+      open(FH, "+<$userspath/$form->{login}.tan") or $form->error("$userspath/$form->{login}.tan : $!");
+
+      $tries = <FH>;
+      $tries++;
+
+      seek(FH, 0, 0);
+      truncate(FH, 0);
+      print FH $tries;
+      close(FH);
+
+      if ($tries > 3) {
+        unlink "$userspath/$form->{login}.conf";
+        unlink "$userspath/$form->{login}.tan";
+        $form->error($locale->text('Maximum tries exceeded!'));
+      }
+    } else {
+      open(FH, ">$userspath/$form->{login}.tan") or $form->error("$userspath/$form->{login}.tan : $!");
+      print FH "1";
+      close(FH);
+    }
+
     $form->error($locale->text('Invalid TAN'));
   } else {
 
     # remove stale locks
     $form->remove_locks(\%myconfig);
+
+    unlink "$userspath/$form->{login}.tan";
 
     $form->{callback} = "menu.pl?action=display";
     for (qw(login path js password)) { $form->{callback} .= "&$_=$form->{$_}" }

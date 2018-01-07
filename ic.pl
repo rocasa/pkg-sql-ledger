@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
 ######################################################################
-# SQL-Ledger ERP
-# Copyright (C) 2006
+# SQL-Ledger
+# Copyright (c) DWS Systems Inc.
 #
 #  Author: DWS Systems Inc.
 #     Web: http://www.sql-ledger.com
@@ -23,7 +23,6 @@ $images = "images";
 $memberfile = "users/members";
 $sendmail = "| /usr/sbin/sendmail -t";
 $latex = 0;
-%printer = ();
 ########## end ###########################################
 
 $| = 1;
@@ -64,13 +63,14 @@ if ($@) {
 
 # locale messages
 $locale = new Locale "$myconfig{countrycode}", "$script";
-$form->{charset} = $locale->{charset};
+
+$form->{charset} = $myconfig{charset};
 
 # send warnings to browser
 $SIG{__WARN__} = sub { eval { $form->info($_[0]); } };
 
 # send errors to browser
-$SIG{__DIE__} = sub { eval { $form->error($_[0]); exit; } };
+$SIG{__DIE__} = sub { eval { $form->error($_[0]); } };
 
 $myconfig{dbpasswd} = unpack 'u', $myconfig{dbpasswd};
 map { $form->{$_} = $myconfig{$_} } qw(stylesheet timeout) unless ($form->{type} eq 'preferences');
@@ -106,19 +106,19 @@ if (-f "$userspath/$myconfig{dbname}.LCK" && $form->{login} ne "admin\@$myconfig
 require "$form->{path}/$form->{script}";
 
 # customized scripts
-if (-f "$form->{path}/custom_$form->{script}") {
-  eval { require "$form->{path}/custom_$form->{script}"; };
+if (-f "$form->{path}/custom/$form->{script}") {
+  eval { require "$form->{path}/custom/$form->{script}"; };
 }
 
 # customized scripts for login
-if (-f "$form->{path}/$form->{login}_$form->{script}") {
-  eval { require "$form->{path}/$form->{login}_$form->{script}"; };
+if (-f "$form->{path}/custom/$form->{login}/$form->{script}") {
+  eval { require "$form->{path}/custom/$form->{login}/$form->{script}"; };
 }
 
 
 if ($form->{action}) {
   # window title bar, user info
-  $form->{titlebar} = "SQL-Ledger ".$locale->text('Version'). " $form->{version} - $myconfig{name} - $myconfig{dbname}";
+  $form->{titlebar} = "SQL-Ledger - $myconfig{name} - $myconfig{dbname}";
 
   &check_password;
 
