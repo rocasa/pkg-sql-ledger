@@ -1,0 +1,2 @@
+# Upstream includes empty directory intentionally, as standard locations for custom scripts
+sql-ledger binary: package-contains-empty-directory usr/share/sql-ledger/bin/lynx/custom/
