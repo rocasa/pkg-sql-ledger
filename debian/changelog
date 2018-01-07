@@ -1,15 +1,16 @@
-sql-ledger (3.0.8-2) UNRELEASED; urgency=medium
+sql-ledger (3.2.6-0~1) UNRELEASED; urgency=medium
 
   TODO:
     - Rewrite debian/copyright, following copyright-format v1.0 guidelines.
-    - Resolve the 'serious' Debian bug #869994, either by packaging a new
-      upstream that fixes it or by including a patch that fixes it.
+  * New upstream. (Closes: #862953)(LP: #1537461)
+  * Add a debian/patches/FixINCissue.patch file. (Closes: #869994)
   * Changes in debian/control:
-    - Set 'Robert James Clay <jame@rocasa.us>' as the new Maintainer.
+    + Declare compliance with Debian Policy 4.1.3.
+    + Set 'Robert James Clay <jame@rocasa.us>' as the new Maintainer.
       (Closes: #862963)
-    - Use the secure URLs for the 'Vcs-Git' and the 'Vcs-Browser' settings.
+    + Set the secure URLs for the 'Vcs-Git' and the 'Vcs-Browser' settings.
 
- -- Robert James Clay <jame@rocasa.us>  Sun, 06 Aug 2017 11:00:22 -0400
+ -- Robert James Clay <jame@rocasa.us>  Sun, 07 Jan 2018 17:53:14 -0500
 
 sql-ledger (3.0.8-1) unstable; urgency=low
 
