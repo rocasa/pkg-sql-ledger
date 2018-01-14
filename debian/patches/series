@@ -2,3 +2,4 @@
 FixINCissue.patch
 latex-cmdline-option
 45crosslink
+MitigateLintianError.patch
