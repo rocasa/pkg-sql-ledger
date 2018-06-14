@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 9), recode
 Homepage: http://www.sql-ledger.com
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/sql-ledger.git
 Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/sql-ledger.git
-Standards-Version: 4.1.3
+Standards-Version: 4.1.4
 
 Package: sql-ledger
 Architecture: all
