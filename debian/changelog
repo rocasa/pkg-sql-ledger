@@ -1,18 +1,22 @@
-sql-ledger (3.2.6-0~2) UNRELEASED; urgency=medium
+sql-ledger (3.2.6-0~3) UNRELEASED; urgency=medium
 
   TODO:
-    - Rewrite debian/copyright, following copyright-format v1.0 guidelines.
-    - Review debian/patches/* and refresh as necessary for new upstream.
+    - Resolve package build failures.
+    - Rewrite debian/copyright, following copyright-format v1.0 guidelines?
   * New upstream. (Closes: #862953)(LP: #1537461)
   * Add a debian/sql-ledger.lintian-overrides file.
   * Add a debian/patches/FixINCissue.patch file. (Closes: #869994)
+  * Add a debian/patches/MitigateLintianError.patch file.
+  * Correct spelling error (Portugese Portuguese) in debian/copyright.
+  * Disabled the 'latex-cmdline-option' patch by removing its name from the
+    debian/patches/series file.
   * Changes in debian/control:
-    + Declare compliance with Debian Policy 4.1.3.
+    + Declare compliance with Debian Policy 4.1.4.
     + Set 'Robert James Clay <jame@rocasa.us>' as the new Maintainer.
       (Closes: #862963)
-    + Set the secure URLs for the 'Vcs-Git' and the 'Vcs-Browser' settings.
+    + Update Vcs-Git & Vcs-Browser entries to the new URLs at salsa.debian.org.
 
- -- Robert James Clay <jame@rocasa.us>  Sun, 07 Jan 2018 18:56:20 -0500
+ -- Robert James Clay <jame@rocasa.us>  Thu, 14 Jun 2018 23:06:53 -0500
 
 sql-ledger (3.0.8-1) unstable; urgency=low
 
