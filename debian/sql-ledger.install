@@ -10,8 +10,8 @@ SL usr/share/sql-ledger/
 sql usr/share/sql-ledger/
 images usr/share/sql-ledger/
 locale usr/share/sql-ledger/
+doc/templates usr/share/sql-ledger/doc
 # Directories offloaded to /var/lib/sql-ledger and writable by www-data
-templates var/lib/sql-ledger/
 users var/lib/sql-ledger/
 css var/lib/sql-ledger/
 # Configuration files
