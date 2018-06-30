@@ -1,117 +1,286 @@
-This package was debianized by Finn-Arne Johansen <faj@bzz.no> on
-Sun,  4 May 2003 05:21:25 +0200.
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SQL-Ledgers
+Upstream-Contact:  Dieter Simader <dsimader@sql-ledger.org>
+Source: https://www.sql-ledger.com/source
+Copyright: 1999-2018, DWS Systems Inc.
 
-It was downloaded from http://prdownloads.sourceforge.net/sql-ledger/sql-ledger-2.0.6.tar.gz?download
+Files: *
+Copyright: 1999-2018, DWS Systems Inc. and Dieter Simader <dsimader@sql-ledger.org>
+License: GPL-2+
 
-Upstream Author: Dieter Simader <dsimader@sql-ledger.org>
+Files: debian/*
+Copyright: 2018, Robert James Clay <jame@rocasa.us>
+           2014-2015, Nigel Kukard <nkukard@lbsd.net>  
+           2006-2014, Raphael Hertzog <hertzog@debian.org>
+           2005-2006, Gerardo Reynoso <greynoso@tindes.com>
+           2004-2005, Petter Reinholdtsen <pere@debian.org>
+           2004,2006, Finn-Arne Johansen <faj@bzz.no>
+License: GPL-2+
 
-    Copyright (c) 1999 - 2015, DWS Systems Inc.
+Files: js/calendar.js
+Comment: modified version for SQL-Ledger to handle multiple formats
+Copyright: Public Domain Software
+License: public-domain
 
-Brazilian texts:
- Author: Andre Felipe Machado <andremachado@techforce.com.br>
-         Miguel Koren O'Brien de Lacy <miguelk@konsultex.com.br>
-Simplified Chinese texts:
- Author: Edmund Lian <elian@inbrief.net>
-Spanish texts:
-Adoption to Colombian Accounting Terms:
-Authors: 	Dirk Enrique Seiffert <info@caribenet.com> 
-	Lourdes Mejía Martinez <lourdes@caribenet.com>
-	Silfredo Godoy Chavez <silfredo@caribenet.com>
+Files: locale/befr/*
+Comment: French texts
+Copyright: 2003 S.bastien Brassard
+           2003 Oscar Buijten
+           2003 Wolfgang Sourdeau
+           2003 Aguibou KONE
+           2003 Jens-Ingo Brodesser
+           2003 Mathieu Chappuis
+           2003 Olivier Cornet
+License: GPL-2+
 
-Catalan Translation:
- Author: Jaume Teixi <teixi@rocacorbit.com>
-Czech texts:
- Author: Tomas Fencl <tomas.fencl@centrum.cz>
-German texts:
- Author: Thomas Bayen <tbayen@bayen.de>
-         Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
-Danish texts:
- Author: Keld Jørn Simonsen <keld@dkuug.dk>
-         Jonas Smedegaard <jonas@jones.dk>
-Estonian texts:
- Author: Martin Lillepuu <martin@lillepuu.com>
-         Lauri Jesmin <jesmin@ut.ee>
-         Tanel Kurvits <rauge@hot.ee>
-Egypt Arabic texts:
-    Author: Omar BaheyEldin <o@ab2.com>
-            Rania Tayel
-#---- Please Use UTF-8 encoding
-#---- For some web servers you have to enable UTF-8
-#---- For Knoquere you have to edit the  font and use an arabic font
---- Good Luck
-#--- Omar BaheyEldin
-British English texts:
- Author:
-Spanish texts:
- Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
-         John Stoddart <jstypo@imagencolor.com.ve>
-         Federico Montesino Pouzols <fedemp@arrok.com>
-         Tomás Pereira <topec@percar.com>
-Spanish texts:
- Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
-         John Stoddart <jstypo@imagencolor.com.ve>
-         Federico Montesino Pouzols <fedemp@arrok.com>
-         Tomás Pereira <topec@percar.com>
-Finish texts:
- Author: Petri Leppänen <mpj@mail.htk.fi>
-French texts:
- Author: Sèbastien Brassard <sbrassar.cgocable.ca>
-         Oscar Buijten <oscar@elbie.com>
-         Wolfgang Sourdeau <wolfgang@contre.com>
-         Aguibou KONE <aguibou.kone@rocketmail.com>
-         Jens-Ingo Brodesser <jens-ingo@all2all.org>
-Hungarian texts:
- Author: Kabai József <kabai@investor.hu>
-Icelandic texts:
- Author: Margeir Reynisson <margeir@met.is>
-Italian texts:
- Author: Paolo Bizzarri <p.bizzarri@icube.it>
-         Luca Venturini <luca@yepa.com>
-         Alessandro Pasotti <apasotti@isoleborromee.it>
-         Daniele Giacomini <daniele@swlibero.org> 2003.09.28-2003.11.05
-Lithuanian texts:
- Author:
-Latvian texts:
- Author: Kaspars Melkis <info@isolis.lv>
-Spanish texts (Mexico):
- Author: Alberto Ladron <h@grupoh.com.mx>
-Dutch texts:
- Author: AJ Hettema <Ignite@ecosse.net>
-         Oscar Buijten <oscar@elbie.com>
-         Bert Tijhuis <domino@dse.nl>
-         Paul Tammes <ptammes@home.nl>
-Norwegian texts:
- Author: Keld Jørn Simonsen <keld@dkuug.dk>
-         Morten Pedersen <morten@workzone.no>
-         Finn-Arne Johansen <faj@bzz.no>
-         Petter Reinholdtsen <pere@hungry.com>
-Spanish texts:
- Author: Maria Gabriela Fong <mgfong@maga.tzo.org>
-Polish texts:
- Author: Peter Dabrowski <meritage@mail.com>
-Portuguese texts:
- Author: Paulo Rodrigues <prodrigues@vianetworks.pt>
-Russian texts:
- Author:
-Swedish texts:
- Author: Jonny Larsson <jonny@lernbo.com>
-         Daniel Andersson <daniel@addelei.nu>
-Spanish texts:
- Author: Carlos López Linares <chlopezl@yahoo.com>
-Turkish texts:
- Author: Mufit Eribol <meribol@deltagrup.com.tr>
-Traditional Chinese texts:
- Author: Edmund Lian <elian@inbrief.net>
-Ukrainian texts:
-Author: Ivan Petrouchtchak <impe@telus.net>
-Spanish Texts (Venezuela):
- Author: John Stoddart <jstypo@imagencolor.com.ve>
+Files: locale/bg/*
+Comment: Bulgarian texts
+Copyright: 2005 Rosen Vladimirov
+License: GPL-2+
 
-These scripts are free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
-later version.
+Files: locale/br/*
+Comment: Brazilian texts
+Copyright: 2002 Andre Felipe Machado
+           2002 Miguel Koren O'Brien de Lacy
+           2002 Marco A B Souza
+License: GPL-2+
 
-On Debian GNU/Linux systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL'.
+Files: locale/cafr/*
+Comment: French texts
+Copyright: 2005 Mathieu Chappuis
+           2005 Oivier Cornet
+License: GPL-2+
 
+Files: locale/ch/*
+Comment: The Swiss-German translation is based on the german texts.
+Copyright: 2006 Alain Haymoz
+           2006 Fabian Schiltknecht
+           2006 Martin Elmer
+           2002 Thomas Bayen
+           2002 Gunter Ohrner
+           2002 Jens Koerner
+           2002 Doris Messmer
+           2002 Wolfgang Foerster
+License: GPL-2+
+
+Files: locale/cn/*
+Comment:  Simplified Chinese (UTF-8) texts: BIG5 translation by: Carfield Yim.
+ Converted to GB and then UTF-8 by: Edmund Lian
+Copyright: 2004 Carfield Yim
+           2004 Edmund Lian
+License: GPL-2+
+
+Files: locale/co/*
+Comment: Adoption to Colombian Accounting Terms
+Copyright: 2005, Dirk Enrique Seiffert
+ 2005 Lourdes Mej.a Martinez
+ 2005 Silfredo Godoy Chavez
+License: GPL-2+
+
+Files: locale/ct/*
+Comment: Catalan Translation
+Copyright: 2002 Jaume Teixi
+License: GPL-2+
+
+Files: locale/cz/*
+Comment: Czech texts
+Copyright: 2001 Tomas Fencl
+License: GPL-2+
+
+Files: locale/de/*
+Comment: German texts
+Copyright: 2002 Thomas Bayen
+           2002 Gunter Ohrner
+           2002 Jens Koerner
+           2002 Doris Messmer
+           2002 Wolfgang Foerster
+License: GPL-2+
+
+Files: locale/dk/*
+Comment: Danish texts
+Copyright: 2001 Keld Jørn Simonsen
+           2001 Jonas Smedegaard
+License: GPL-2+
+
+Files: locale/ee/*
+Comment: Estonian texts
+Copyright: 2006 Andrei Kolu
+License: GPL-2+
+
+Files: locale/eg/*
+Comment: Egypt Arabic texts
+Copyright: 2003 Omar BaheyEldin
+           2003 Rania Tayel
+License: GPL-2+
+
+Files: locale/es/*
+Comment: Spanish texts
+Copyright: 2002 Maria Gabriela Fong
+           2002 John Stoddart
+           2002 Federico Montesino Pouzols
+           2002 Tomás Pereira 
+License: GPL-2+
+
+Files: locale/fi/*
+Comment: Finnish texts
+Copyright: 2002 2006 Petri Leppänen
+           2002 2006 Jukka Aho
+           2002 2006 Paul Saris 
+License: GPL-2+
+
+Files: locale/fr/*
+Comment: French texts
+Copyright: 2003 S.bastien Brassard
+           2003 Oscar Buijten
+           2003 Wolfgang Sourdeau
+           2003 Aguibou KONE
+           2003 Jens-Ingo Brodesser
+           2003 Mathieu Chappuis
+           2003 Daniel Andron 
+License: GPL-2+
+
+Files: locale/gr/*
+Comment: Greek texts
+Copyright: 2004 Dimitris Andavoglou
+License: GPL-2+
+
+Files: locale/hu/*
+Comment: Hungarian texts
+Copyright: 2003 Kabai József
+License: GPL-2+
+
+Files: locale/id/*
+Comment: Indonesian texts
+Copyright: 2005 Akhmad Daniel Sembiring
+License: GPL-2+
+
+Files: locale/is/*
+Comment: Icelandic texts
+Copyright: 2003 Margeir Reynisson
+License: GPL-2+
+
+Files: locale/it/*
+Comment: Italian texts
+Copyright: 2001-2003 Paolo Bizzarri
+           2001-2003 Luca Venturini
+           2001-2003 Alessandro Pasotti
+           2001-2003 Daniele Giacomini
+License: GPL-2+
+
+Files: locale/lv/*
+Comment: Latian texts
+Copyright: 2003 Kaspars Melkis
+License: GPL-2+
+
+Files: locale/mx/*
+Comment: Spanish texts (Mexico) UTF-8
+Copyright: 2001 Alberto Ladron
+           2001 Hernan Garcia
+License: GPL-2+
+
+Files: locale/nb/*
+Comment: Norwegian Bokmål texts
+Copyright: 2001,2004 Keld Jørn Simonsen
+           2001,2004 Keld Morten Pedersen
+           2001,2004 Keld Finn-Arne Johansen
+           2001,2004 Keld Petter Reinholdtsen
+           2001,2004 Keld Erik Inge Bolsø
+License: GPL-2+
+
+Files: locale/nl/*
+Comment: Dutch texts
+Copyright: 2001 AJ Hettema
+           2001 Oscar Buijten
+           2001 Bert Tijhuis
+           2001 Paul Tammes
+           2001 Arno Peters
+License: GPL-2+
+
+Files: locale/pa/*
+Comment: Spanish texts
+Copyright: 2001 Maria Gabriela Fong
+License: GPL-2+
+
+Files: locale/pl/*
+Comment: Polish texts
+Copyright: 2013 Aleksander Opoczynski
+License: GPL-2+
+
+Files: locale/pt/*
+Comment: Portugese texts
+Copyright: 2001 Paulo Rodrigues
+License: GPL-2+
+
+Files: locale/py/*
+Comment: Spanish texts
+Copyright: 2002-2004 Maria Gabriela Fong
+           2002-2004 John Stoddart
+           2002-2004 Federico Montesino Pouzols
+           2002-2004 Tomás Pereira
+           2002-2004 Mario L. Epp
+License: GPL-2+
+
+Files: locale/ru/*
+Comment: Russian texts
+Copyright: 2005 Alexey Cherepanov
+License: GPL-2+
+
+Files: locale/se/*
+Comment: Swedish texts
+Copyright: 2003 Jonny Larsson
+           2003 Daniel Andersson
+           2003 Johan Hambraeus
+License: GPL-2+
+
+Files: locale/sk/*
+Comment: Slovak texts
+Copyright: 2009 Peter Meszaros
+License: GPL-2+
+
+Files: locale/sv/*
+Comment: Spanish texts
+Copyright: 2004 Maria Gabriela Fong
+License: GPL-2+
+
+Files: locale/tr/*
+Comment: Turkish texts
+Copyright: 2001 Mufit Eribol
+License: GPL-2+
+
+Files: locale/tw/*
+Comment: Traditional Chinese texts
+Copyright: 2004 Edmund Lian
+           2004 Kent Tong 
+License: GPL-2+
+
+Files: locale/ua/*
+Comment: Ukrainian texts
+Copyright: 2003-2005 Ivan Petrouchtchak
+License: GPL-2+
+
+Files: locale/ve/*
+Comment: Spanish texts
+Copyright: 2001 John Stoddart
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with this package; if not, write to the Free
+ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
