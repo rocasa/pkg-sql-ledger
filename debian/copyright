@@ -75,9 +75,9 @@ License: GPL-2+
 
 Files: locale/co/*
 Comment: Adoption to Colombian Accounting Terms
-Copyright: 2005, Dirk Enrique Seiffert
- 2005 Lourdes Mej.a Martinez
- 2005 Silfredo Godoy Chavez
+Copyright: 2005 Dirk Enrique Seiffert
+           2005 Lourdes Mej.a Martinez
+           2005 Silfredo Godoy Chavez
 License: GPL-2+
 
 Files: locale/ct/*
