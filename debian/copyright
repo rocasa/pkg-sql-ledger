@@ -21,6 +21,9 @@ Files: js/calendar.js
 Comment: modified version for SQL-Ledger to handle multiple formats
 Copyright: Public Domain Software
 License: public-domain
+ The following is noted in the comments at the beginning of the file:
+ .
+ Public Domain Software... You're welcome.
 
 Files: locale/befr/*
 Comment: French texts
