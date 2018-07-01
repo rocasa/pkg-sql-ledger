@@ -1,7 +1,5 @@
-sql-ledger (3.2.6-0~7) UNRELEASED; urgency=medium
+sql-ledger (3.2.6-0~8) UNRELEASED; urgency=medium
 
-  TODO:
-    - Resolve package update issues.
   * New upstream. (Closes: #862953)(LP: #1537461)
   * Use an HTTPS URL in the debian/watch file.
   * Removed the debian/patches/latex-cmdline-option patch file as it does not
@@ -17,7 +15,7 @@ sql-ledger (3.2.6-0~7) UNRELEASED; urgency=medium
       (Closes: #862963)
     + Update Vcs-Git & Vcs-Browser entries to the new URLs at salsa.debian.org.
 
- -- Robert James Clay <jame@rocasa.us>  Sat, 30 Jun 2018 18:31:19 -0400
+ -- Robert James Clay <jame@rocasa.us>  Sun, 01 Jul 2018 19:10:31 -0400
 
 sql-ledger (3.0.8-1) unstable; urgency=low
 
