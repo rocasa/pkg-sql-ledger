@@ -1,3 +1,11 @@
+sql-ledger (3.2.6-1) UNRELEASED; urgency=medium
+
+  When upgrading to this version, you need to update your datasets and your
+  files manually. Please follow the instructions given at the end of the 
+  file /usr/share/doc/sql-ledger/UPGRADE.gz.
+
+ -- Robert James Clay <jame@rocasa.us>  Mon, 02 Jul 2018 20:41:15 -0400
+
 sql-ledger (3.0.0-1) unstable; urgency=low
 
   When upgrading to this version, you have to update some
