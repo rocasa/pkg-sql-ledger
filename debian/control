@@ -1,7 +1,7 @@
 Source: sql-ledger
 Section: web
 Priority: optional
-Maintainer: Robert James Clay <jame@rocasa.us> 
+Maintainer: Robert James Clay <jame@rocasa.us>
 Build-Depends: debhelper (>= 9), recode
 Homepage: https://www.sql-ledger.com
 Vcs-Git: https://salsa.debian.org/debian/sql-ledger.git
