@@ -100,7 +100,7 @@ sql-ledger (3.0.0-1) unstable; urgency=low
 
 sql-ledger (2.8.36-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
   * Use debhelper compatibility level 9.
   * Update description to drop leading article (lintian warning).
   * Updated Standards-Version to 3.9.2.
@@ -118,10 +118,10 @@ sql-ledger (2.8.33-1) unstable; urgency=low
 
 sql-ledger (2.8.32-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
     - fixed SQL injection
     - fixed date paid formatting
-    - updated Dutch translation 
+    - updated Dutch translation
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Nov 2010 00:08:46 +0100
 
@@ -130,7 +130,7 @@ sql-ledger (2.8.31-1) unstable; urgency=low
   * New upstream release.
     - moved Sunday on timecard report to keep weekend together
     - fixed update problem with multiple taxes
-    - removed extra lines from Vouchers menu 
+    - removed extra lines from Vouchers menu
   * Updated Standards-Version to 3.9.1 (no changes).
 
  -- Raphaël Hertzog <hertzog@debian.org>  Wed, 20 Oct 2010 22:55:10 +0200
@@ -139,7 +139,7 @@ sql-ledger (2.8.30-1) unstable; urgency=low
 
   * New upstream release:
     - added inventory transfer module
-    - fixed broken pipe issue when printing reminders 
+    - fixed broken pipe issue when printing reminders
 
  -- Raphaël Hertzog <hertzog@debian.org>  Fri, 09 Apr 2010 14:44:35 +0200
 
@@ -172,7 +172,7 @@ sql-ledger (2.8.27-1) unstable; urgency=low
 
 sql-ledger (2.8.26-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Raphaël Hertzog <hertzog@debian.org>  Thu, 22 Oct 2009 12:40:32 +0200
 
@@ -217,14 +217,14 @@ sql-ledger (2.8.23-1) unstable; urgency=low
 
   * New upstream release:
     From 2.8.23:
-    - corrected version number 
+    - corrected version number
     From 2.8.22:
-    - removed extra files not needed 
+    - removed extra files not needed
     From 2.8.21:
     - fixed formatting error for recurring transactions
     - make/model is now included on parts reports with invoices
     - added function to assign new number
-    - added variable to include proper shipping address for batch printing 
+    - added variable to include proper shipping address for batch printing
 
  -- Raphael Hertzog <hertzog@debian.org>  Mon, 16 Feb 2009 23:30:58 +0100
 
@@ -232,7 +232,7 @@ sql-ledger (2.8.20-1) unstable; urgency=low
 
   * New upstream release.
     From 2.8.20:
-    - fixed "database handle destroyed" error when printing 
+    - fixed "database handle destroyed" error when printing
     From 2.8.19:
     - added missing localization strings for batch printing module
     - added query to unlock orders when invoice is removed
@@ -242,14 +242,14 @@ sql-ledger (2.8.20-1) unstable; urgency=low
       address
     - added missing lineitem details on ship/receive screen
     - changed template parser to allow for multiple spaces and inline if
-      statements 
+      statements
   * Add ${misc:Depends} to the Depends field.
 
  -- Raphael Hertzog <hertzog@debian.org>  Thu, 15 Jan 2009 10:46:03 +0100
 
 sql-ledger (2.8.18-1) unstable; urgency=low
 
-  * New upstream release. It contains again more fixes for perl 5.10. 
+  * New upstream release. It contains again more fixes for perl 5.10.
   * Drop useless prerm and add missing "set -e" in postinst.
   * s/latex/LaTeX/ in the package's description.
 
@@ -286,7 +286,7 @@ sql-ledger (2.8.14-2) unstable; urgency=low
 
 sql-ledger (2.8.14-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
     * Close a few security issues. Closes: #418724
   * Add Homepage field.
   * Replaced dependency on apache by apache2. Closes: #482158
@@ -364,7 +364,7 @@ sql-ledger (2.6.16-1) unstable; urgency=low
     - added source field on drill-down list
     - changed random number generator to avoid overwriting existing partnumber
     - added hidden sales flag to employee screen
-    - fixed menu to exclude phantom lines 
+    - fixed menu to exclude phantom lines
 
  -- Raphael Hertzog <hertzog@debian.org>  Sun, 20 Aug 2006 11:52:42 +0200
 
@@ -372,7 +372,7 @@ sql-ledger (2.6.15-1) unstable; urgency=low
 
   * New upstream version:
     - fixed tax calculation for recurring transactions when rate changes
-    - fixed query error for non-taxable report 
+    - fixed query error for non-taxable report
 
  -- Raphael Hertzog <hertzog@debian.org>  Mon,  3 Jul 2006 18:45:36 +0200
 
