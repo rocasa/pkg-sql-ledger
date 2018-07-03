@@ -4,7 +4,11 @@ sql-ledger (3.2.6-1) UNRELEASED; urgency=medium
   files manually. Please follow the instructions given at the end of the 
   file /usr/share/doc/sql-ledger/UPGRADE.gz.
 
- -- Robert James Clay <jame@rocasa.us>  Mon, 02 Jul 2018 20:41:15 -0400
+  The old Debian only 'latex-cmdline-option' patch does not apply to the new
+  upstream and so has been removed and the option that it added is not currently
+  available.
+
+ -- Robert James Clay <jame@rocasa.us>  Mon, 02 Jul 2018 20:54:15 -0400
 
 sql-ledger (3.0.0-1) unstable; urgency=low
 
