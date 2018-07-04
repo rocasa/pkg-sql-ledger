@@ -1,4 +1,4 @@
-sql-ledger (3.2.6-1) UNRELEASED; urgency=medium
+sql-ledger (3.2.6-1) unstable; urgency=medium
 
   When upgrading to this version, you need to update your datasets and your
   files manually. Please follow the instructions given at the end of the 
@@ -8,7 +8,7 @@ sql-ledger (3.2.6-1) UNRELEASED; urgency=medium
   upstream and so has been removed and the option that it added is not currently
   available.
 
- -- Robert James Clay <jame@rocasa.us>  Mon, 02 Jul 2018 20:54:15 -0400
+ -- Robert James Clay <jame@rocasa.us>  Wed, 04 Jul 2018 14:38:54 -0400
 
 sql-ledger (3.0.0-1) unstable; urgency=low
 
