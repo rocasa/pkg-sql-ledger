@@ -1,4 +1,4 @@
 # List of patches to apply.
 FixINCissue.patch
 45crosslink
-MitigateLintianError.patch
+MitigateSourceMissingLintianError.patch
