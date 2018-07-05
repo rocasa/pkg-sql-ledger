@@ -1,0 +1,10 @@
+# Upstream does not provide any testing facilities to use with autopkgtest.
+sql-ledger source: testsuite-autopkgtest-missing
+
+# Upstream includes empty directory intentionally, as standard locations for custom scripts
+sql-ledger source: source-contains-empty-directory bin/lynx/custom/
+sql-ledger source: source-contains-empty-directory bin/mozilla/custom/
+
+# Upstream includes empty directory intentionally.
+sql-ledger source: source-contains-empty-directory spool/
+sql-ledger source: source-contains-empty-directory templates/
