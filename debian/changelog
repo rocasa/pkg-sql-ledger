@@ -1,7 +1,10 @@
 sql-ledger (3.2.6-1) unstable; urgency=medium
 
   * New upstream. (Closes: #862953)(LP: #1537461)
+  * Bump the Debhelper version from '9' to '10'.
   * Use an HTTPS URL in the debian/watch file.
+  * Add the following Lintian override files: debian/source/lintian-overrides
+    and debian/sql-ledger.lintian-overrides.
   * Removed the debian/patches/latex-cmdline-option patch file as it does not
     apply to the new upstream.
   * Add a debian/patches/FixINCissue.patch file. (Closes: #869994)
@@ -15,7 +18,7 @@ sql-ledger (3.2.6-1) unstable; urgency=medium
       (Closes: #862963)
     + Update Vcs-Git & Vcs-Browser entries to the new URLs at salsa.debian.org.
 
- -- Robert James Clay <jame@rocasa.us>  Mon, 02 Jul 2018 21:01:21 -0400
+ -- Robert James Clay <jame@rocasa.us>  Thu, 05 Jul 2018 20:56:47 -0400
 
 sql-ledger (3.0.8-1) unstable; urgency=low
 
