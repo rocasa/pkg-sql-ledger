@@ -5,10 +5,10 @@ sql-ledger (3.2.6-1) unstable; urgency=medium
   file /usr/share/doc/sql-ledger/UPGRADE.gz.
 
   The old Debian only 'latex-cmdline-option' patch does not apply to the new
-  upstream and so has been removed and the option that it added is not currently
-  available.
+  upstream and so has been removed and the option that it added, that can allow
+  chnageing pdflatax config variables, is now not currently available.
 
- -- Robert James Clay <jame@rocasa.us>  Wed, 04 Jul 2018 14:38:54 -0400
+ -- Robert James Clay <jame@rocasa.us>  Thu, 05 Jul 2018 20:49:38 -0400
 
 sql-ledger (3.0.0-1) unstable; urgency=low
 
